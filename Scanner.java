@@ -15,13 +15,15 @@ public class Scanner {
                 PrintWriter out = new PrintWriter(link.getOutputStream(),true);
                 String str = args[0];
                 out.println(str);
-                String message;
-                message = InputBuff.readLine();
-                int cmp = message.compareTo("TROUVE");
-                if (cmp == 0) {
+                //String message;
+                //message = InputBuff.readLine();
+                
+                //Réponse du serveur
+                //int cmp = message.compareTo("TROUVE");
+                /*if (cmp == 0) {
                     System.out.println("TROUVE sur le port " + i);
                     break;
-                }
+                }*/
                 InputBuff.close();
                 out.close();
                 link.close();

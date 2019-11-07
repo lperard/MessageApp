@@ -9,11 +9,11 @@ public class Sock {
 
     public static void main (String[] args)throws IOException {
         Socket link = new Socket("127.0.0.1", Server.port);
-
+        System.out.println("Connexion au localhost\n");
+        
         BufferedReader InputBuff = new BufferedReader(new InputStreamReader(link.getInputStream()));
         PrintWriter out = new PrintWriter(link.getOutputStream(),true);
-
-        
+        System.out.println("Streams en place\n");
         
         Date date = new Date(System.currentTimeMillis());
         SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
