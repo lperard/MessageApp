@@ -2,14 +2,13 @@ import java.net.*;
 import java.io.*;
 
 
-public class Server  {
-    static int port = 1998;
+public class Server {
+    static int Serverport = 49152;
+    static int next_serv = 49153;
     public static void main (String[] args) throws IOException{
         
-        Server[] bonsoir;
-        for(int i = 1980; i < 2000; i++) {
-            bonsoir.append(new Server(i));
-        }
+        //Quand on recoit un certain message genre "initiate connection, on port= 2000", on lance un thread qui va recevoir
+        Server mainServ = new Server(first_port);
 
     }
 
@@ -31,6 +30,11 @@ public class Server  {
             if (buff != null) {
                 //out.println(message);
             }
+            
+            
+            
+            
+            //Fermeture de la connexion
             int cmp = buff.compareTo("END");
             if (cmp == 0) {
                 System.out.println("COCUOU");
@@ -40,7 +44,8 @@ public class Server  {
             }
             cmp = buff.compareTo("Server?");
             if (cmp == 0) {
-                System.out.println("Bien vu!");
+                System.out.println(next_serv);
+                next_serv++;
                 sock.close();
                 //out.close();
                 InputBuff.close();

@@ -7,30 +7,80 @@ import java.text.SimpleDateFormat;
 
 public class Sock {
 
+    private int port;
+
+    private Socket linkServ;
+
+    private BufferedReader currentInputBuff;
+
+    private PrintWrinter currentOut;
+
+    private String lastData;
+
+    public Sock() {
+        this.lastData = "";
+    }
+
     public static void main (String[] args)throws IOException {
-        Socket link = new Socket("127.0.0.1", Server.port);
-        System.out.println("Connexion au localhost\n");
         
-        BufferedReader InputBuff = new BufferedReader(new InputStreamReader(link.getInputStream()));
-        PrintWriter out = new PrintWriter(link.getOutputStream(),true);
-        System.out.println("Streams en place\n");
+        Sock sock = new Sock();
+        Sock.connectdingToServer();
+        int sent_port;
+        //int cmp = str.compareTo("JOUR");
         
-        Date date = new Date(System.currentTimeMillis());
-        SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
-        System.out.println(formatter.format(date));
-        String str = args[0];
-        int cmp = str.compareTo("JOUR");
+        
+        out.println("Server?");
+        sent_port = InputBuff.readLine();
+
+        //On coupe l'ancienne connexion et on se connecte au nouveau serveur
+        
+
+
+
+        //this.port = sent_port;
         if (cmp == 0) {
-            out.println(date);          // envoi d'un message
+                      // envoi d'un message
         }
         else {
             out.println(str);
         }
         //System.out.println(date);
-        InputBuff.close();
-        out.close();
-        link.close();
-
-
     }
+
+    private void setupConnection(String host, int port) {
+        this.linkServ = new Socket(host, port);
+        this.currentInputBuff = new BufferedReader(new InputStreamReader(linkServ.getInputStream()));
+        this.currentOut = new PrintWriter(linkServ.getOutputStream(),true);
+        
+        /*Socket linkServ = new Socket("127.0.0.1", 49152);
+        System.out.println("Connexion au localhost\n");
+        BufferedReader InputBuff = new BufferedReader(new InputStreamReader(linkServ.getInputStream()));
+        PrintWriter out = new PrintWriter(linkServ.getOutputStream(),true);
+        System.out.println("Streams en place\n");*/
+    }
+    
+    private void connectingToServer () {
+        setupConnection("127.0.0.1", 49152);
+    }
+    private Integer waitForData() {
+        String data = "";
+        data = this.currentInputBuff.readLine();
+        return data;
+    }
+    private void endConnection() {
+        this.linkServ.close();
+        this.InputBuff.close();
+        this.out.close();
+
+        /*linkServ.close();
+        InputBuff.close();
+        out.close();*/
+    }
+
+
+
 }
+//Gestion de l'horodatage des messages
+        /*Date date = new Date(System.currentTimeMillis());
+        SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
+        System.out.println(formatter.format(date));*/
