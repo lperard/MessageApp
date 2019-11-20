@@ -3,12 +3,12 @@ import java.io.*;
 
 
 public class Server {
-    static int Serverport = 49152;
+    static int Serverport = 5000;
     static int next_serv = 49153;
     public static void main (String[] args) throws IOException{
         
         //Quand on recoit un certain message genre "initiate connection, on port= 2000", on lance un thread qui va recevoir
-        Server mainServ = new Server(first_port);
+        Server mainServ = new Server(Serverport);
 
     }
 
