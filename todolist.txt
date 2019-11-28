@@ -1,0 +1,3 @@
+Envoi de message à une personne, puis à plusieurs.
+Gestion de BDD, logs.
+Puis à la fin gestion de l'interface.

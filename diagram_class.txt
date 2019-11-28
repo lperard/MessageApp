@@ -1,0 +1,117 @@
+PACKAGES:
+
+CONTROLLER {
+
+MainController:
+- model : BddManager
+- view : InterfaceManager
+- com : SocketManager
+
+
++ initialize() // Vérifie si bdd existe, si non -> création de la bdd
++ displayLoginWindow()
++ choosePseudo() // input user => update la bdd
++ getOnlineUsers()  // broadcast pour récupérer les users online et les insérer dans la bdd
++ notifyUser() // broadcast de id/pseudo
++ displayChatWindow()
+
++ startSession(User target) // Crée une communication (socket) avec target
++ leaveSession(User target) // Ferme la communication avec target
++ activeSessionGUI(User target) // Vérifie l'existence d'un panel avec target. Si oui -> setVisible, si non -> le crée puis setVisible
++ sendMessage(byte[] data, User target) //
++ getLog(User target)
+
+
+SocketManager:
+
+}
+
+VIEW {
+
+InterfaceManager:
+- login : LoginWindow
+- chat_window : ChatWindow
+
++ setActiveChatFrame(User target) // désactive toutes les chatframe et active celle avec target
++ changeActiveChatPanel(User target)
++ displayChatWindow()
++ displayLoginWindow()
+
+LoginWindow:
+- login_frame : JFrame
+- change_pseudo : JButton
+- enter_pseudo : JTextField
+
+ChatWindow:
+- chat_frame : JFrame
+- user_list : UserPanel
+- chat_panel : <User,ChatPanel>HashMap
+- active_chat_panel : ChatPanel
+- msg_to_send : JTextField
+- send_button : JButton
+- pseudo_panel : JPanel
+- current_pseudo : JLabel
+- change_pseudo : JButton
+
++ display() // appelle pack(), appelle setVisible() et recrée une 
++ changeActiveChatPanel(User target) // 
+
+UserPanel:
+- connected_users : User list
+
++ displayUserList() // Crée un JButton pour chaque connected user 
+
+ChatPanel:
+- dest: User
+- isActive: bool
+- message_history : Log
+
+}
+
+MODEL {
+
+BddManager:
+- logs: Log list
+- connectedUsers: User list
+- localUser: User
+
++ addMsg(string source, string dest, byte[] data) // notify
++ getMsgHistory(User target) // if Log with target doesn't exit => instanciate a Log with the user, read the bdd to get all messages involving this user, create a Message for each, add this Message to Log and then add this Log to logs | else parcourir logs jusqu'à Log.getTarget() = target then getHistory()
++ addUser(id, pseudo) // notify
++ rmUser(id) // notify
++ getConnectedUsers()
++ setLocalUser(id, pseudo)
++ getLocalUser()
+
+Log:
+- target: User
+- history: Message list
+
+- setTarget(User user)
+- getTarget()
+- addMsg(string source, string dest, byte[] data)
+- getHistory()
+
+
+Message:
+- source : string // id de la source
+- dest : string // id du destinataire
+- data : byte[]
+
++ getSource()
++ setSource(string source)
++ getDest()
++ setDest(string dest)
++ getData()
++ setData(byte[] data)
+
+User:
+- id: string
+- pseudo: string
+
++ getId()
++ setId(string id)
++ getPseudo()
++ setPseudo(string pseudo)
+
+}
