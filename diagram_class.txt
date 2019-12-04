@@ -7,22 +7,59 @@ MainController:
 - view : InterfaceManager
 - com : SocketManager
 
-
 + initialize() // Vérifie si bdd existe, si non -> création de la bdd
 + displayLoginWindow()
-+ choosePseudo() // input user => update la bdd
-+ getOnlineUsers()  // broadcast pour récupérer les users online et les insérer dans la bdd
-+ notifyUser() // broadcast de id/pseudo
++ getLocalUser() : User
++ choosePseudo() // input user => update la bdd (addUser()) puis broadcast
++ notifyUserConnection() // broadcast de id/pseudo et attend les réponses des online users pour les insérer dans la bdd
++ notifyUserDisconnection() // broadcast de id/pseudo
 + displayChatWindow()
 
 + startSession(User target) // Crée une communication (socket) avec target
 + leaveSession(User target) // Ferme la communication avec target
 + activeSessionGUI(User target) // Vérifie l'existence d'un panel avec target. Si oui -> setVisible, si non -> le crée puis setVisible
-+ sendMessage(byte[] data, User target) //
+
++ sendMessage(byte[] data, User target) // only user messages
++ processMessage(Message msg) // send the message to the bddmanager to decode it
 + getLog(User target)
 
 
 SocketManager:
+- list_session : HashMap <User,ClientConnection>
+- frontdoor : waitingConnection
+- broadcast_socket : UDPSocket
+
++ initiateClientConnection(User target)
++ acceptRemoteConnection(Socket socket)
++ listenConnection() : Socket
++ listenMessage() : byte[] data
++ sendUserMessage(byte[] data, User target)
++ sendSystemMessage(type_sys ts, User source) // appelle broadcast UDP
+
+
+public enum type_sys {Hello, Goodbye, ChangePseudo}
+
+ClientConnection extends Thread:
+- dest : User
+- socket : Socket
+
++ sendMessage(byte[] data) // adds US in front of the message, to know it's a user message 
++ readLine()
++ println(byte[] data) //sends data to the destination user
+
+
+waitingConnection extends Thread:
+- serv_socket : ServerSocket
+
++ listen() : Socket
++ createClientConnection(Socket socket)
+
+
+UDPSocket:
+- socket : DatagramSocket
+
++ broadcast(User source, bool state) // state = connected or not
++ listen() // wait for other users broadcasts
 
 }
 
@@ -75,9 +112,10 @@ BddManager:
 - connectedUsers: User list
 - localUser: User
 
-+ addMsg(string source, string dest, byte[] data) // notify
++ decode(Message msg) // takes a msg, finds whether it is an user msg or a system message and forwards it to the right method 
++ addMsg(Message msg) // notify
 + getMsgHistory(User target) // if Log with target doesn't exit => instanciate a Log with the user, read the bdd to get all messages involving this user, create a Message for each, add this Message to Log and then add this Log to logs | else parcourir logs jusqu'à Log.getTarget() = target then getHistory()
-+ addUser(id, pseudo) // notify
++ addUser(id, pseudo) // notify. If User doesnt exist, creates it. Else, updates its pseudo.
 + rmUser(id) // notify
 + getConnectedUsers()
 + setLocalUser(id, pseudo)
@@ -97,6 +135,7 @@ Message:
 - source : string // id de la source
 - dest : string // id du destinataire
 - data : byte[]
+- timestamp : Date
 
 + getSource()
 + setSource(string source)
@@ -104,9 +143,12 @@ Message:
 + setDest(string dest)
 + getData()
 + setData(byte[] data)
++ getTimestamp()
++ setTimestamp(Date timestamp)
+
 
 User:
-- id: string
+- id: string // adresse IP ou hash
 - pseudo: string
 
 + getId()
