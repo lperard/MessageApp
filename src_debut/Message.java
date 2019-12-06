@@ -1,1 +1,1 @@
-qsfdq
+public class Message {}

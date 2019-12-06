@@ -1,3 +1,4 @@
+/*
 package com.sdz.model;
 
 import java.util.ArrayList;
@@ -29,3 +30,4 @@ public abstract class AbstractModel implements Observable {
             obs.update(str);
     }
 }
+*/

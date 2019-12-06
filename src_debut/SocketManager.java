@@ -4,10 +4,12 @@ import java.io.*;
 public class SocketManager {
 
     static public void main (String[] args) throws SocketException, UnknownHostException, IOException {
-        SendManager sendM = new SendManager();
+        int sendPort = Integer.parseInt(args[0]);
+        int receivePort = Integer.parseInt(args[1]);
+        SendManager sendM = new SendManager(sendPort);
         Thread send = new Thread(sendM);
         send.start();
-        ReceiveManager receiveM = new ReceiveManager(5000);
+        ReceiveManager receiveM = new ReceiveManager(receivePort);
         Thread receive = new Thread(receiveM);
         receive.start();
         System.out.println("On a lancé les threads");

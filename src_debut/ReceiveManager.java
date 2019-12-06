@@ -7,15 +7,14 @@ public class ReceiveManager implements Runnable{
         private int port;
 
         public ReceiveManager (int port) {
-            try{this.sock = new DatagramSocket(5000);}
+            try{this.sock = new DatagramSocket(port);}
             catch (SocketException e) {
                 System.out.println("Ca bug");
             }
-            this.port = 5000;
+            this.port = port;
         }
         public void run() {
             System.out.println("Lancement du thread de reception");
-            int cmp = 0;
             while(true) {
                 byte[] buffer = new byte[256];
                 DatagramPacket in = new DatagramPacket(buffer, buffer.length);
@@ -23,12 +22,10 @@ public class ReceiveManager implements Runnable{
                 catch (IOException io) {
                     System.out.println("Ca rebug");
                 }
-                cmp++;
                 InetAddress clientAddress = in.getAddress();
                 int clientPort = in.getPort();
                 String msg = new String(in.getData(),0, in.getLength());
                 System.out.println(msg);
-                System.out.println(cmp);
             }
         }
         

@@ -1,1 +1,1 @@
-fqd
+public class Log{}
