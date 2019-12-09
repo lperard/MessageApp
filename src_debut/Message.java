@@ -1,4 +1,4 @@
-package com.sdz.model;
+/*package com.sdz.model;
 
 import java.net.*;
 import java.util.*;
@@ -41,3 +41,4 @@ public class Message {
     }
 
 }
+*/

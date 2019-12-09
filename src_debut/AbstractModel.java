@@ -1,5 +1,5 @@
 package com.sdz.model;
-
+/*
 import java.util.ArrayList;
 import java.util.HashMap;
 import com.sdz.observer.Observable;
@@ -42,3 +42,4 @@ public abstract class AbstractModel implements Observable {
             obs.update(str);
     }
 }
+*/

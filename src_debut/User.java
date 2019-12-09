@@ -1,4 +1,4 @@
-package com.sdz.model;
+/*package com.sdz.model;
 
 import java.net.*;
 
@@ -39,3 +39,4 @@ public class User {
     }
     
 }
+*/

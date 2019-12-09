@@ -1,10 +1,10 @@
-package com.sdz.model;
+/*package com.sdz.model;
 
 import java.util.ArrayList;
 
 public class Log {
 
-    protected ArrayList<Message> history = new ArrayList<Message();
+    protected ArrayList<Message> history = new ArrayList<Message>();
 
     public void addMessage(Message msg) {
         this.history.add(msg);
@@ -15,3 +15,4 @@ public class Log {
     }
 
 }
+*/
