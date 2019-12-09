@@ -1,5 +1,3 @@
-/*package com.sdz.model;
-
 import java.util.ArrayList;
 
 public class Log {
@@ -15,4 +13,4 @@ public class Log {
     }
 
 }
-*/
+

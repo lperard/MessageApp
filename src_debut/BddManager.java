@@ -1,24 +1,32 @@
-/*package com.sdz.model;
-import com.sdz.observer.Observable;
-*/
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.net.*;
+import java.sql.*;
+
 /* CECI EST UNE PREMIERE VERSION OU LES MESSAGES NE SONT PAS PERSISTENTS (ILS DISPARAISSENT
 D'UNE UTILISATION A L'AUTRE. UNE VERSION AMELIOREE SERAIT DE STOCKER LES MESSAGES DANS UNE BDD
 LOCALE COMME SQLITE QUI STOCK LES DONNEES DANS UN FICHIER EN LOCAL. DANS CE CAS, IL FAUDRA CHANGER 
 LES CLASSES LOG ET MESSAGE : SUPPRIMER MESSAGE ET LOG DEVIENDRAIT UNE CLASSE QUI ECRIT DANS LA BDD ET
 QUI PEUT LIRE DANS LA BDD POUR RECUPERER LES HISTORIQUES DE MESSAGE 
 OU AUTRE SOLUTION : ECRIRE DANS DES FICHIERS AVEC UN FORMAT JSON, XML OU CSV*/
-/*
+
 public class BddManager extends AbstractModel {
 
     public BddManager() {
         this.logs = new HashMap<InetAddress,Log>();
         this.connected_users = new ArrayList<User>();
-        this.local_user = User(InetAddress.getLocalHost(),"");
+        try {
+            InetAddress address = InetAddress.getLocalHost();
+            this.local_user = new User(address,"");
+        }
+        catch (UnknownHostException e) {
+            System.out.println("Unknown Host Address !\n");
+        }
         this.listObserver = new ArrayList<Observer>();
     }
 
     public void setLocalUser(User target) {
-        this.local_user = User;
+        this.local_user = target;
         // Faut-il notifier qqch à la view ici ???
     }
 
@@ -40,7 +48,7 @@ public class BddManager extends AbstractModel {
         return this.connected_users;
     }
 
-    public void addMessage(InetAddress source, InetAddress dest, byte[] data, Date timestamp) {
+    public void addMessage(InetAddress source, InetAddress dest, byte[] data, String timestamp) {
         Message message = new Message(source,dest,data,timestamp);
 
         if(local_user.getId() == source) {
@@ -57,11 +65,24 @@ public class BddManager extends AbstractModel {
         Log history = this.logs.get(target);
         if(history ==  null) {
             Log log = new Log();
-            this.logs.add(target,log);
+            this.logs.put(target,log);
             history = log;
         }
         return history;
     }
     
+    // Implémentation du pattern observer
+    public void addObserver(Observer obs) {
+        this.listObserver.add(obs);
+    }
+
+    public void removeObserver() {
+        listObserver = new ArrayList<Observer>();
+    }
+
+    public void notifyObserver(String str) {
+        for(Observer obs : listObserver)
+            obs.update(str);
+    }
 }
-*/
+

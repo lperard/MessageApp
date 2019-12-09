@@ -1,12 +1,10 @@
-/*package com.sdz.model;
-
 import java.net.*;
 
 public class User {
 
     protected InetAddress id;
     protected String pseudo;
-    protected bool connected;
+    protected boolean connected;
     
     public User(InetAddress id, String pseudo) {
         this.id = id;
@@ -22,11 +20,11 @@ public class User {
         return this.pseudo;
     }
 
-    public void setConnected(bool connected) {
+    public void setConnected(boolean connected) {
         this.connected = connected;
     }
 
-    public bool getConnected() {
+    public boolean getConnected() {
         return this.connected;
     }
 
@@ -39,4 +37,4 @@ public class User {
     }
     
 }
-*/
+
