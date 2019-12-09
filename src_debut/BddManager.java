@@ -1,19 +1,28 @@
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.net.*;
 import java.sql.*;
 
-/* CECI EST UNE PREMIERE VERSION OU LES MESSAGES NE SONT PAS PERSISTENTS (ILS DISPARAISSENT
-D'UNE UTILISATION A L'AUTRE. UNE VERSION AMELIOREE SERAIT DE STOCKER LES MESSAGES DANS UNE BDD
-LOCALE COMME SQLITE QUI STOCK LES DONNEES DANS UN FICHIER EN LOCAL. DANS CE CAS, IL FAUDRA CHANGER 
-LES CLASSES LOG ET MESSAGE : SUPPRIMER MESSAGE ET LOG DEVIENDRAIT UNE CLASSE QUI ECRIT DANS LA BDD ET
-QUI PEUT LIRE DANS LA BDD POUR RECUPERER LES HISTORIQUES DE MESSAGE 
-OU AUTRE SOLUTION : ECRIRE DANS DES FICHIERS AVEC UN FORMAT JSON, XML OU CSV*/
+public class BddManager implements Observable {
 
-public class BddManager extends AbstractModel {
+    private Connection bdd_connection;
+    private Statement bdd_statement; 
+    protected ArrayList<User> connected_users;
+    protected User local_user;
+    protected ArrayList<Observer> listObserver;
 
     public BddManager() {
-        this.logs = new HashMap<InetAddress,Log>();
+        try {
+            Class.forName("org.sqlite.JDBC");
+            this.bdd_connection = DriverManager.getConnection("jdbc:sqlite:test.db");
+            System.out.println("Opened database successfully");
+
+            this.bdd_statement = this.bdd_connection.createStatement();
+        }
+        catch (Exception e) {
+            System.err.println(e.getClass().getName()+":"+e.getMessage());
+            System.exit(0);
+        }
+
         this.connected_users = new ArrayList<User>();
         try {
             InetAddress address = InetAddress.getLocalHost();
@@ -21,6 +30,7 @@ public class BddManager extends AbstractModel {
         }
         catch (UnknownHostException e) {
             System.out.println("Unknown Host Address !\n");
+            System.exit(0);
         }
         this.listObserver = new ArrayList<Observer>();
     }
@@ -49,29 +59,63 @@ public class BddManager extends AbstractModel {
     }
 
     public void addMessage(InetAddress source, InetAddress dest, byte[] data, String timestamp) {
-        Message message = new Message(source,dest,data,timestamp);
+        String sql="";
+        String data_str = new String(data);       
 
-        if(local_user.getId() == source) {
-            this.getMsgHistory(dest).addMessage(message);
-            notifyObserver("new_message_to_"+ dest.getHostAddress());
-        }
-        else if(local_user.getId() == dest) {
-            this.getMsgHistory(source).addMessage(message);
-            notifyObserver("new_message_from_"+ source.getHostAddress());
+        try {
+
+            Class.forName("org.sqlite.JDBC");
+            this.bdd_connection = DriverManager.getConnection("jdbc:sqlite:test.db");
+            System.out.println("Opened database successfully");
+
+            this.bdd_statement = this.bdd_connection.createStatement();
+
+            if(local_user.getId() == source) {
+                
+                sql = "create table if not exists LOG_"+dest.getHostAddress()+" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(100), timestamp VARCHAR(20))";
+                System.out.println(sql);
+                this.bdd_statement.executeUpdate(sql);
+
+                sql = "insert into LOG_"+dest.getHostAddress()+" (source,dest,data,timestamp) values ('"+source.getHostAddress()+"', '"+dest.getHostAddress()+"', '"+data_str+"', '"+timestamp+"');";
+                System.out.println(sql);
+                this.bdd_statement.executeUpdate(sql);
+        
+                notifyObserver("new_message_to_"+ dest.getHostAddress());
+            }
+            else if(local_user.getId() == dest) {
+                sql = "create table if not exists LOG_"+source.getHostAddress()+" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(100), timestamp VARCHAR(20))";
+                 this.bdd_statement.executeUpdate(sql);
+
+                sql = "insert into LOG_"+source.getHostAddress()+" (source,dest,data,timestamp) values ('"+source.getHostAddress()+"', '"+dest.getHostAddress()+"', '"+data_str+"', '"+timestamp+"');";
+                this.bdd_statement.executeUpdate(sql);
+
+                notifyObserver("new_message_from_"+ source.getHostAddress());
+            }
+            
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName()+":"+e.getMessage());
+            System.exit(0);
         }
     }
 
-    public Log getMsgHistory(InetAddress target) {
-        Log history = this.logs.get(target);
-        if(history ==  null) {
-            Log log = new Log();
-            this.logs.put(target,log);
-            history = log;
+    public ResultSet getMsgHistory(InetAddress target) {
+        ResultSet rs = null;
+                
+        try {        
+            String sql = "create table if not exists LOG_"+target.getHostAddress()+" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(100), timestamp VARCHAR(20))";
+            this.bdd_statement.executeUpdate(sql);
+
+            sql = "select * from LOG_"+target.getHostAddress()+";";
+            rs = this.bdd_statement.executeQuery(sql);
+
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName()+":"+e.getMessage());
+            System.exit(0);
         }
-        return history;
+        return rs;
     }
     
-    // Implémentation du pattern observer
+    // Implémentation du pattern observable
     public void addObserver(Observer obs) {
         this.listObserver.add(obs);
     }
