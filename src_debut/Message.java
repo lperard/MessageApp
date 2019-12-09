@@ -1,16 +1,16 @@
-/*package com.sdz.model;
-
 import java.net.*;
 import java.util.*;
+import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 
 public class Message {
 
     protected InetAddress source;
     protected InetAddress dest;
     protected byte[] data;
-    protected Date timestamp;
+    protected String timestamp;
 
-    public Message(InetAddress source, InetAddress dest, byte[] data, Date timestamp) {
+    public Message(InetAddress source, InetAddress dest, byte[] data, String timestamp) {
         this.source = source;
         this.dest = dest;
         this.data = data;
@@ -19,8 +19,8 @@ public class Message {
         }
         else {        
             DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-            Date timestamp = new Date();
-            this.timestamp = dateFormat.format(timestamp);
+            Date date = new Date();
+            this.timestamp = dateFormat.format(date);
         }
     }
 
@@ -36,9 +36,9 @@ public class Message {
         return this.data;
     }
 
-    public Date getTimestamp() {
+    public String getTimestamp() {
         return this.timestamp;
     }
 
 }
-*/
+
