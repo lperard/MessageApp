@@ -1,6 +1,10 @@
 import java.net.*;
 import java.io.*;
 import java.util.Scanner;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.IOException;
+import java.io.Serializable;
 
 public class SendManager implements Runnable{
 
@@ -17,7 +21,28 @@ public class SendManager implements Runnable{
     }
     public void run() {
         System.out.println("Lancement du thread d'envoi");
-        String message = constructMessageSystem(Type.Hello);
+        try {
+            InetAddress ip = InetAddress.getLocalHost();
+            User user = new User(ip, "Didiax");
+            MessageSys msg_sys = new MessageSys(Type.Hello,user);
+            //MAINTENANT ON SERIALIZE
+            
+
+
+
+
+
+
+
+
+
+
+            String message = msg_sys.constructMessageSystem();
+            System.out.println(message);
+        }
+        catch (UnknownHostException e) {
+            System.out.println ("Erreur dans la récupération du nom d'hôte");
+        }
         Scanner input = new Scanner(System.in);
         while(true) {
             String msg = input.nextLine();
@@ -40,20 +65,10 @@ public class SendManager implements Runnable{
         //input.close();
     }
 
-    public void sendBroadcast (Type type) {
+    public void sendBroadcast (MessageSys msgSys) {
         /*DatagramSocket BroadcastSocket = new DatagramSocket();
         BroadcastSocket.setBroadcast(true);
         String message_sys = new String(constructMessageSystem());
         DatagramPacket message_broadcasted = new DatagramPacket();*/
-    }
-
-    public String constructMessageSystem (Type type) {
-        String message = "";
-        System.out.println(type.toString());
-        String nom = type.toString();
-        System.out.println(nom);
-        message += nom;
-        System.out.println(message);
-        return message;
     }
 }

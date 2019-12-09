@@ -1,6 +1,6 @@
 import java.net.*;
 
-public class User {
+public class User implements Serializable {
 
     protected InetAddress id;
     protected String pseudo;
@@ -9,7 +9,7 @@ public class User {
     public User(InetAddress id, String pseudo) {
         this.id = id;
         this.pseudo = pseudo;
-        this.connected=false;        
+        this.connected = false;        
     }
 
     public void setPseudo(String pseudo) {
@@ -36,5 +36,9 @@ public class User {
         return this.id;
     }
     
+    public String toString () {
+        String print = id.getHostAddress() + " " + pseudo;
+        return print; 
+    }
 }
 
