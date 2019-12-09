@@ -17,6 +17,7 @@ public class SendManager implements Runnable{
     }
     public void run() {
         System.out.println("Lancement du thread d'envoi");
+        String message = constructMessageSystem(Type.Hello);
         Scanner input = new Scanner(System.in);
         while(true) {
             String msg = input.nextLine();
@@ -37,5 +38,22 @@ public class SendManager implements Runnable{
         
         //sock.close();
         //input.close();
+    }
+
+    public void sendBroadcast (Type type) {
+        /*DatagramSocket BroadcastSocket = new DatagramSocket();
+        BroadcastSocket.setBroadcast(true);
+        String message_sys = new String(constructMessageSystem());
+        DatagramPacket message_broadcasted = new DatagramPacket();*/
+    }
+
+    public String constructMessageSystem (Type type) {
+        String message = "";
+        System.out.println(type.toString());
+        String nom = type.toString();
+        System.out.println(nom);
+        message += nom;
+        System.out.println(message);
+        return message;
     }
 }
