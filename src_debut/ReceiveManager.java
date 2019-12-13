@@ -24,16 +24,27 @@ public class ReceiveManager implements Runnable{
         public void run() {
             System.out.println("Lancement du thread de reception");
             while(true) {
-                byte[] buffer = new byte[256];
+                byte[] buffer = new byte[1024]; // préparation du buffer
                 DatagramPacket in = new DatagramPacket(buffer, buffer.length);
                 try{sock.receive(in);}
                 catch (IOException io) {
                     System.out.println("Ca rebug");
                 }
-                InetAddress clientAddress = in.getAddress();
-                int clientPort = in.getPort();
-                String msg = new String(in.getData(),0, in.getLength());
-                System.out.println(msg);
+                ByteArrayInputStream inStream = new ByteArrayInputStream(in.getData());
+                try {	
+                	ObjectInput inObj = new ObjectInputStream(inStream);
+                	//Recupère l'adresse du client et le port sur leuquel le client envoi
+                	/*InetAddress clientAddress = in.getAddress();
+                	int clientPort = in.getPort();*/
+                	MessageSys message_sys_received = (MessageSys) inObj.readObject();
+                	System.out.println(message_sys_received.constructMessageSystem());
+                }
+                catch (IOException | ClassNotFoundException e) {
+                	e.printStackTrace();
+                }
+                
+                /*String msg = new String(in.getData(),0, in.getLength());
+                System.out.println(msg);*/
             }
         }
         

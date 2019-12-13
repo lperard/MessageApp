@@ -1,6 +1,9 @@
 import java.io.Serializable;
 public class MessageSys implements Serializable {
-    private Type type;
+	
+	private static final long serialVersionUID = 3333L;
+	
+	private Type type;
 
     private User user;
 

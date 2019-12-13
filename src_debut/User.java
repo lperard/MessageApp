@@ -1,7 +1,7 @@
 import java.net.*;
 import java.io.Serializable;
 public class User implements Serializable {
-
+    private static final long serialVersionUID = 2222L;
     protected InetAddress id;
     protected String pseudo;
     protected boolean connected;

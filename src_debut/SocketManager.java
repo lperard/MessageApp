@@ -3,7 +3,7 @@ import java.net.*;
 import java.io.*;
 public class SocketManager {
 
-    static public void main (String[] args) throws SocketException, UnknownHostException, IOException {
+     public static void main (String[] args) throws SocketException, UnknownHostException, IOException {
         int sendPort = Integer.parseInt(args[0]);
         int receivePort = Integer.parseInt(args[1]);
         SendManager sendM = new SendManager(sendPort);

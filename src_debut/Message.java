@@ -1,14 +1,20 @@
+import java.io.Serializable;
 import java.net.*;
 import java.util.*;
 import java.text.SimpleDateFormat;
 import java.text.DateFormat;
 
-public class Message {
-
-    protected InetAddress source;
-    protected InetAddress dest;
-    protected byte[] data;
-    protected String timestamp;
+public class Message implements Serializable{
+    
+	private static final long serialVersionUID = 1111L;
+    
+	protected InetAddress source;
+    
+	protected InetAddress dest;
+    
+	protected byte[] data;
+    
+	protected String timestamp;
 
     public Message(InetAddress source, InetAddress dest, byte[] data, String timestamp) {
         this.source = source;
