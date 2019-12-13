@@ -11,17 +11,8 @@ public class BddManager implements Observable {
     protected ArrayList<Observer> listObserver;
 
     public BddManager() {
-        try {
-            Class.forName("org.sqlite.JDBC");
-            this.bdd_connection = DriverManager.getConnection("jdbc:sqlite:test.db");
-            System.out.println("Opened database successfully");
-
-            this.bdd_statement = this.bdd_connection.createStatement();
-        }
-        catch (Exception e) {
-            System.err.println(e.getClass().getName()+":"+e.getMessage());
-            System.exit(0);
-        }
+        this.bdd_connection = null;
+        this.bdd_statement = null;
 
         this.connected_users = new ArrayList<User>();
         try {
@@ -60,6 +51,10 @@ public class BddManager implements Observable {
 
     public void addMessage(InetAddress source, InetAddress dest, byte[] data, String timestamp) {
         String sql="";
+        String source_address = source.getHostAddress();
+        String dest_address = dest.getHostAddress();
+        String source_reformatted = source_address.replace('.','_');
+        String dest_reformatted = dest_address.replace('.','_');
         String data_str = new String(data);       
 
         try {
@@ -72,24 +67,24 @@ public class BddManager implements Observable {
 
             if(local_user.getId() == source) {
                 
-                sql = "create table if not exists LOG_"+dest.getHostAddress()+" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(100), timestamp VARCHAR(20))";
+                sql = "create table if not exists LOG_"+ dest_reformatted +" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(100), timestamp VARCHAR(20))";
                 System.out.println(sql);
                 this.bdd_statement.executeUpdate(sql);
 
-                sql = "insert into LOG_"+dest.getHostAddress()+" (source,dest,data,timestamp) values ('"+source.getHostAddress()+"', '"+dest.getHostAddress()+"', '"+data_str+"', '"+timestamp+"');";
+                sql = "insert into LOG_"+ dest_reformatted +" (source,dest,data,timestamp) values ('"+ source_address +"', '"+ dest_address +"', '"+data_str+"', '"+timestamp+"');";
                 System.out.println(sql);
                 this.bdd_statement.executeUpdate(sql);
         
-                notifyObserver("new_message_to_"+ dest.getHostAddress());
+                notifyObserver("new_message_to_"+ dest_address);
             }
             else if(local_user.getId() == dest) {
-                sql = "create table if not exists LOG_"+source.getHostAddress()+" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(100), timestamp VARCHAR(20))";
+                sql = "create table if not exists LOG_"+ source_reformatted +" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(100), timestamp VARCHAR(20))";
                  this.bdd_statement.executeUpdate(sql);
 
-                sql = "insert into LOG_"+source.getHostAddress()+" (source,dest,data,timestamp) values ('"+source.getHostAddress()+"', '"+dest.getHostAddress()+"', '"+data_str+"', '"+timestamp+"');";
+                sql = "insert into LOG_"+ source_reformatted +" (source,dest,data,timestamp) values ('"+ source_address +"', '"+ dest_address +"', '"+data_str+"', '"+timestamp+"');";
                 this.bdd_statement.executeUpdate(sql);
 
-                notifyObserver("new_message_from_"+ source.getHostAddress());
+                notifyObserver("new_message_from_"+ source_address);
             }
             
         } catch (Exception e) {
@@ -98,21 +93,40 @@ public class BddManager implements Observable {
         }
     }
 
-    public ResultSet getMsgHistory(InetAddress target) {
+    public Log getMsgHistory(InetAddress target) {
         ResultSet rs = null;
-                
+        String target_address = target.getHostAddress();
+        String target_reformatted = target_address.replace('.','_');
+         
+        Log log = new Log();
+       
         try {        
-            String sql = "create table if not exists LOG_"+target.getHostAddress()+" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(100), timestamp VARCHAR(20))";
+            String sql = "create table if not exists LOG_"+ target_reformatted +" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(100), timestamp VARCHAR(20))";
             this.bdd_statement.executeUpdate(sql);
 
-            sql = "select * from LOG_"+target.getHostAddress()+";";
+            sql = "select * from LOG_"+ target_reformatted +";";
             rs = this.bdd_statement.executeQuery(sql);
+            
+            while(rs.next()) {
+                String source = rs.getString("source");
+                String dest = rs.getString("dest");
+                String data_str = rs.getString("data");
+                String timestamp = rs.getString("timestamp");
+
+                InetAddress source_address = InetAddress.getByName(source);
+                InetAddress dest_address = InetAddress.getByName(dest);
+                byte[] data = data_str.getBytes();
+
+                Message tmp_msg = new Message(source_address,dest_address,data,timestamp);
+                log.addMessage(tmp_msg);
+            }
 
         } catch (Exception e) {
             System.err.println(e.getClass().getName()+":"+e.getMessage());
             System.exit(0);
         }
-        return rs;
+        
+        return log;
     }
     
     // Implémentation du pattern observable
