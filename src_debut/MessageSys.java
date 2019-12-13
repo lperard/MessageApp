@@ -1,3 +1,4 @@
+import java.io.Serializable;
 public class MessageSys implements Serializable {
     private Type type;
 
