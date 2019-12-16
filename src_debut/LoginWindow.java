@@ -58,11 +58,18 @@ public class LoginWindow extends JFrame {
     }
 
     public void addComponentsToPane(final Container pane) {
-        pane.setLayout(new GridLayout(0,2));
-
-        pane.add(labelPseudo);
-        pane.add(textPseudo);
-        pane.add(button);
+        pane.setLayout(new BoxLayout(pane, BoxLayout.PAGE_AXIS));
+        JPanel toppane = new JPanel();
+        toppane.add(Box.createRigidArea(new Dimension(0,1)));
+        toppane.add(labelPseudo);
+        toppane.add(textPseudo);
+        textPseudo.setPreferredSize(new Dimension(150,25));
+        pane.add(toppane);
+        
+        JPanel but = new JPanel();
+        but.add(Box.createRigidArea(new Dimension(0,1)));
+        but.add(button);
+        pane.add(but);
 
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -75,8 +82,9 @@ public class LoginWindow extends JFrame {
         JFrame.setDefaultLookAndFeelDecorated(true);
         LoginWindow frame = new LoginWindow("MessageApp");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setPreferredSize(new Dimension(640, 480));
-        
+        frame.setPreferredSize(new Dimension(300, 150));
+        frame.setMaximumSize(new Dimension(300,150));
+        frame.setLocationRelativeTo(null);
         frame.addComponentsToPane(frame.getContentPane());
         frame.pack();
         frame.setVisible(true);
