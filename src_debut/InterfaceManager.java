@@ -4,15 +4,15 @@ import java.awt.event.*;
 
 public class InterfaceManager implements Observer {
 
-    public void displayLoginWindow() {
+    /*public void displayLoginWindow() {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 LoginWindow.createAndShowGUI();            
             }
         });
-    }
+    }*/
 
-    public void displayChatWindow() {
+    public void displayChatConnection() {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 ChatWindow.createAndShowGUI();
@@ -26,7 +26,7 @@ public class InterfaceManager implements Observer {
 
     public static void main(String[] args) {
         InterfaceManager UI = new InterfaceManager();        
-        UI.displayChatWindow();
+        UI.displayChatConnection();
     }
     
 }
