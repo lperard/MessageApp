@@ -28,7 +28,9 @@ public class ReceiveManager implements Runnable{
             while(true) {
                 byte[] buffer = new byte[1024]; // préparation du buffer
                 DatagramPacket in = new DatagramPacket(buffer, buffer.length);
-                try{sock.receive(in);}
+                try{
+                	sock.receive(in);
+                }
                 catch (IOException io) {
                     System.out.println("Ca rebug");
                 }
@@ -38,11 +40,28 @@ public class ReceiveManager implements Runnable{
                 	//Recupère l'adresse du client et le port sur leuquel le client envoi
                 	/*InetAddress clientAddress = in.getAddress();
                 	int clientPort = in.getPort();*/
-                	MessageSys message_sys_received = (MessageSys) inObj.readObject();
-                	System.out.println(message_sys_received.constructMessageSystem());
+                	Object o = inObj.readObject();
+                	//System.out.println(o.getClass().toString());
+                	if (o.getClass().toString().compareTo("class MessageSys") == 0) {
+                		System.out.println("ITS A TRAP");
+                		MessageSys message_sys_received = (MessageSys) o;
+                		//PROCESSRECEIVDATASYS
+                	}
+                	else if (o.getClass().toString().compareTo("class Message") == 0){
+                		System.out.println("Well");
+                		Message message_received = (Message) o;
+                		//PROCESSRECEIVDATAMSG
+                	}
+                	else {
+                		System.out.println("On est dans les choux");
+                	}
+                	
+                	//System.out.println(message_sys_received.getType().toString());
+                	//System.out.println(message_sys_received.constructMessageSystem());
                 }
                 catch (IOException | ClassNotFoundException e) {
                 	e.printStackTrace();
+                	System.out.println("Ca marche pas");
                 }
                 
                 /*String msg = new String(in.getData(),0, in.getLength());

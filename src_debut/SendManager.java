@@ -50,7 +50,7 @@ public class SendManager implements Runnable{
                     System.out.println("Ca rebug");
                 }
                 }
-            //https://www.javaworld.com/article/2077539/java-tip-40--object-transport-via-datagram-packets.htmlhttps://www.javaworld.com/article/2077539/java-tip-40--object-transport-via-datagram-packets.htmlhttps://www.javaworld.com/article/2077539/java-tip-40--object-transport-via-datagram-packets.htmlhttps://www.javaworld.com/article/2077539/java-tip-40--object-transport-via-datagram-packets.htmlhttps://www.javaworld.com/article/2077539/java-tip-40--object-transport-via-datagram-packets.htmlhttps://www.javaworld.com/article/2077539/java-tip-40--object-transport-via-datagram-packets.htmlhttps://www.javaworld.com/article/2077539/java-tip-40--object-transport-via-datagram-packets.htmlhttps://www.javaworld.com/article/2077539/java-tip-40--object-transport-via-datagram-packets.html
+            //https://www.javaworld.com/article/2077539/java-tip-40--object-transport-via-datagram-packets.html
             catch (UnknownHostException uhe) {
                 System.out.println("Oula");
             } catch (IOException e) {

@@ -3,13 +3,13 @@ public enum Type {
     Goodbye("GDBYE"),
     ChangePseudo("CHPSD");
 
-private String type = "";
+	private String type = "";
 
-Type(String type){
-    this.type = type;
-}
+	Type(String type){
+		this.type = type;
+	}
 
-public String toString (){
-    return this.type;
-}
+	public String toString (){
+		return this.type;
+	}
 }
