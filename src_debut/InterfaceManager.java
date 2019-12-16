@@ -12,13 +12,13 @@ public class InterfaceManager implements Observer {
         });
     }
 
-    /*public void displayChatWindow() {
+    public void displayChatWindow() {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 ChatWindow.createAndShowGUI();
             }
          });
-    }*/
+    }
     
     // Implémentation du pattern observer
     public void update(String str) {
@@ -26,7 +26,7 @@ public class InterfaceManager implements Observer {
 
     public static void main(String[] args) {
         InterfaceManager UI = new InterfaceManager();        
-        UI.displayLoginWindow();
+        UI.displayChatWindow();
     }
     
 }

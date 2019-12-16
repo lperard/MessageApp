@@ -11,9 +11,9 @@ public class ChatWindow extends JFrame {
     private JLabel current_pseudo = null;
     private JButton change_pseudo_button = new JButton("Change pseudo");
 
-    public ChatWindow(String name, String current_pseudo) {
+    public ChatWindow(String name/*, String current_pseudo*/) {
         super(name);
-        this.current_pseudo = new JLabel(current_pseudo);
+        //this.current_pseudo = new JLabel(current_pseudo);
     }
 
     private static void initLookAndFeel() {
@@ -60,13 +60,29 @@ public class ChatWindow extends JFrame {
     }
 
     public void addComponentsToPane(final Container pane) {
-        // A COMPLETER CHECK LE MODELE SUR LOGINWINDOW.JAVA
+    	pane.setLayout(new BoxLayout(pane, BoxLayout.PAGE_AXIS));
+        JPanel toppane = new JPanel();
+        toppane.add(Box.createRigidArea(new Dimension(0,1)));
+        toppane.add(labelPseudo);
+        toppane.add(textPseudo);
+        textPseudo.setPreferredSize(new Dimension(150,25));
+        pane.add(toppane);
+        
+        JPanel but = new JPanel();
+        but.add(Box.createRigidArea(new Dimension(0,1)));
+        but.add(button);
+        pane.add(but);
+
+        button.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            }
+        });
     }
 
-    public static void createAndShowGUI(String pseudo) {
+    public static void createAndShowGUI(/*String pseudo*/) {
         initLookAndFeel();
         JFrame.setDefaultLookAndFeelDecorated(true);
-        ChatWindow frame = new ChatWindow("MessageApp",pseudo);
+        ChatWindow frame = new ChatWindow("MessageApp"/*,pseudo*/);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setPreferredSize(new Dimension(640, 480));
         
