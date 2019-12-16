@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.Serializable;
 
 public class SendManager implements Runnable{
-    private static final long serialVersionUID = 1111L;
+
     private DatagramSocket sock;
 
     private int port;
@@ -23,7 +23,7 @@ public class SendManager implements Runnable{
         System.out.println("Lancement du thread d'envoi");
         MessageSys msg_sys = null;
         try {
-            InetAddress ip = InetAddress.getLocalHost();
+            InetAddress ip = InetAddress.getLocalHost(); //Envoi à soi même
             User user = new User(ip, "Didiax");
             msg_sys = new MessageSys(Type.Hello,user);
             //String message = msg_sys.constructMessageSystem();        
@@ -42,7 +42,6 @@ public class SendManager implements Runnable{
                 //DatagramPacket out = new DatagramPacket(msg.getBytes(), msg.length(), host, port);
                 byte[] objectSerialized = null;
                 ObjectOutputStream objOut = new ObjectOutputStream(outByte);
-            	outByte = new ByteArrayOutputStream();
             	objOut.writeObject(msg_sys); //envoi de l'objet serializé
             	objectSerialized = outByte.toByteArray();
             	DatagramPacket objPacket = new DatagramPacket(objectSerialized, objectSerialized.length, host, this.port);
@@ -51,7 +50,7 @@ public class SendManager implements Runnable{
                     System.out.println("Ca rebug");
                 }
                 }
-            https://www.javaworld.com/article/2077539/java-tip-40--object-transport-via-datagram-packets.htmlhttps://www.javaworld.com/article/2077539/java-tip-40--object-transport-via-datagram-packets.htmlhttps://www.javaworld.com/article/2077539/java-tip-40--object-transport-via-datagram-packets.htmlhttps://www.javaworld.com/article/2077539/java-tip-40--object-transport-via-datagram-packets.htmlhttps://www.javaworld.com/article/2077539/java-tip-40--object-transport-via-datagram-packets.htmlhttps://www.javaworld.com/article/2077539/java-tip-40--object-transport-via-datagram-packets.htmlhttps://www.javaworld.com/article/2077539/java-tip-40--object-transport-via-datagram-packets.htmlhttps://www.javaworld.com/article/2077539/java-tip-40--object-transport-via-datagram-packets.html
+            //https://www.javaworld.com/article/2077539/java-tip-40--object-transport-via-datagram-packets.html
             catch (UnknownHostException uhe) {
                 System.out.println("Oula");
             } catch (IOException e) {
