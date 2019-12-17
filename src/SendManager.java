@@ -36,34 +36,50 @@ public class SendManager implements Runnable{
         ByteArrayOutputStream outByte = null;
         while(true) {
             //String msg = input.nextLine();
-            try{ 
-                InetAddress host = InetAddress.getLocalHost();
-    			outByte = new ByteArrayOutputStream();
-                //DatagramPacket out = new DatagramPacket(msg.getBytes(), msg.length(), host, port);
-                byte[] objectSerialized = null;
-                ObjectOutputStream objOut = new ObjectOutputStream(outByte);
-            	objOut.writeObject(msg_sys); //envoi de l'objet serializé
-            	objectSerialized = outByte.toByteArray();
-            	DatagramPacket objPacket = new DatagramPacket(objectSerialized, objectSerialized.length, host, this.port);
-                try{sock.send(objPacket);}
-                catch (IOException io) {
-                    System.out.println("Ca rebug");
-                }
-                }
-            //https://www.javaworld.com/article/2077539/java-tip-40--object-transport-via-datagram-packets.html
-            catch (UnknownHostException uhe) {
-                System.out.println("Oula");
-            } catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+        	try{
+        		InetAddress nous = InetAddress.getByName("10.1.5.99");
+        		UDPserializeSend(msg_sys, nous);
+        	}
+        	catch (UnknownHostException e) {
+        		System.out.println("ba mince");
+        	}
+        	
         }
         
         
         //sock.close();
-        //input.close();
+        //input.close()
     }
 
+    private void UDPserializeSend (Object obj, InetAddress distant) {
+    	ByteArrayOutputStream outByte = null;
+    	try{ 
+			outByte = new ByteArrayOutputStream();
+            //DatagramPacket out = new DatagramPacket(msg.getBytes(), msg.length(), host, port);
+            byte[] objectSerialized = null;
+            ObjectOutputStream objOut = new ObjectOutputStream(outByte);
+        	objOut.writeObject(obj); //envoi de l'objet serializé
+        	objectSerialized = outByte.toByteArray();
+        	DatagramPacket objPacket = new DatagramPacket(objectSerialized, objectSerialized.length, distant, this.port);
+            try{
+            	sock.send(objPacket);
+            	System.out.println("Envoi d'un objet serializé");
+            	outByte.close();
+            	objOut.close();
+            }
+            catch (IOException e) {
+                System.out.println("Ca rebug");
+            }
+        }
+    	catch (UnknownHostException uhe) {
+    		uhe.printStackTrace();
+			System.out.println(uhe.toString());
+		}
+    	catch (IOException e) {
+    		e.printStackTrace();
+			System.out.println(e.toString());
+    	}
+    }
     public void sendBroadcast (MessageSys msgSys) {
         /*DatagramSocket BroadcastSocket = new DatagramSocket();
         BroadcastSocket.setBroadcast(true);
