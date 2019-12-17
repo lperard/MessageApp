@@ -16,13 +16,13 @@ public class BddManager implements Observable {
 
         try {
           Class.forName("org.sqlite.JDBC");
-          this.bdd_connection = DriverManager.getConnection("jdbc:sqlite:test.db");
+          this.bdd_connection = DriverManager.getConnection("jdbc:sqlite:app.db");
+          System.out.println("Opened database successfully");
           this.bdd_statement = this.bdd_connection.createStatement();
-        } catch ( Exception e ) {
-          System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+        } catch (Exception e) {
+          System.err.println(e.getClass().getName()+":"+e.getMessage());
           System.exit(0);
         }
-        System.out.println("Opened database successfully");
 
         this.connected_users = new ArrayList<User>();
         try {
@@ -41,7 +41,7 @@ public class BddManager implements Observable {
         // Faut-il notifier qqch à la view ici ???
     }
 
-    public User getLocalUser() {
+    public User getLocalUser(User target) {
         return this.local_user;
     }
 
@@ -69,24 +69,25 @@ public class BddManager implements Observable {
 
         try {
 
-            // ON TEST SI ON PEUT OUVRIR LA CONNECTION A LA BDD JUSTE UNE FOIS DANS LE CONSTRUCTEUR
             /*Class.forName("org.sqlite.JDBC");
             this.bdd_connection = DriverManager.getConnection("jdbc:sqlite:app.db");
             System.out.println("Opened database successfully");
 
             this.bdd_statement = this.bdd_connection.createStatement();*/
 
-            if(local_user.getId().equals(source)) {
+            if(local_user.getId() == source) {
 
                 sql = "create table if not exists LOG_"+ dest_reformatted +" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(100), timestamp VARCHAR(20))";
+                System.out.println(sql);
                 this.bdd_statement.executeUpdate(sql);
 
                 sql = "insert into LOG_"+ dest_reformatted +" (source,dest,data,timestamp) values ('"+ source_address +"', '"+ dest_address +"', '"+data_str+"', '"+timestamp+"');";
+                System.out.println(sql);
                 this.bdd_statement.executeUpdate(sql);
 
                 notifyObserver("new_message_to_"+ dest_address);
             }
-            else if(local_user.getId().equals(dest)) {
+            else if(local_user.getId() == dest) {
                 sql = "create table if not exists LOG_"+ source_reformatted +" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(100), timestamp VARCHAR(20))";
                  this.bdd_statement.executeUpdate(sql);
 
