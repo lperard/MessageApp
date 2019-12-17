@@ -59,7 +59,7 @@ public class ReceiveManager implements Runnable{
             	}
             	else if (o.getClass().toString().compareTo("class Message") == 0){
             		System.out.println("Well");
-            		Message message_received = (Message) o;
+            		//Message message_received = (Message) o;
             		//PROCESSRECEIVDATAMSG
             	}
             	else {

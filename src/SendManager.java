@@ -11,9 +11,12 @@ public class SendManager implements Runnable{
     private DatagramSocket sock;
 
     private int port;
+    
+    private InetAddress addr_distant;
 
-    public SendManager(int port){
+    public SendManager(int port, InetAddress addr_distant){
         this.port = port;
+        this.addr_distant = addr_distant;
         try {this.sock = new DatagramSocket();}
         catch (SocketException e) {
             System.out.println("Ca bug");
@@ -26,22 +29,19 @@ public class SendManager implements Runnable{
             InetAddress ip = InetAddress.getLocalHost(); //Envoi à soi même
             User user = new User(ip, "Didiax");
             msg_sys = new MessageSys(Type.Hello,user);
-            //String message = msg_sys.constructMessageSystem();        
-            //System.out.println(message);
         }
         catch (UnknownHostException e) {
-            System.out.println ("Erreur dans la récupération du nom d'hôte");
+            e.printStackTrace();
         }
         Scanner input = new Scanner(System.in);
         ByteArrayOutputStream outByte = null;
         while(true) {
-            //String msg = input.nextLine();
         	try{
-        		InetAddress nous = InetAddress.getByName("10.1.5.99");
-        		UDPserializeSend(msg_sys, nous);
+        		Thread.sleep(1000);
+        		UDPserializeSend(msg_sys, this.addr_distant);
         	}
-        	catch (UnknownHostException e) {
-        		System.out.println("ba mince");
+        	catch (InterruptedException e) {
+        		e.printStackTrace();
         	}
         	
         }
@@ -68,16 +68,14 @@ public class SendManager implements Runnable{
             	objOut.close();
             }
             catch (IOException e) {
-                System.out.println("Ca rebug");
+            	e.printStackTrace();
             }
         }
     	catch (UnknownHostException uhe) {
     		uhe.printStackTrace();
-			System.out.println(uhe.toString());
 		}
     	catch (IOException e) {
     		e.printStackTrace();
-			System.out.println(e.toString());
     	}
     }
     public void sendBroadcast (MessageSys msgSys) {
