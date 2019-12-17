@@ -16,5 +16,4 @@ public class SocketManager {
         receive.start();
         System.out.println("On a lancé les threads");
     }
-
 }

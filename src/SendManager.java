@@ -34,15 +34,19 @@ public class SendManager implements Runnable{
             e.printStackTrace();
         }
         Scanner input = new Scanner(System.in);
-        ByteArrayOutputStream outByte = null;
         while(true) {
         	try{
         		Thread.sleep(1000);
-        		UDPserializeSend(msg_sys, this.addr_distant);
+        		//UDPserializeSend(msg_sys, this.addr_distant);
+        		sendBroadcast(msg_sys);
         	}
         	catch (InterruptedException e) {
         		e.printStackTrace();
-        	}
+        	} catch (SocketException e) {
+				e.printStackTrace();
+			} catch (UnknownHostException e) {
+				e.printStackTrace();
+			}
         	
         }
         
@@ -78,10 +82,9 @@ public class SendManager implements Runnable{
     		e.printStackTrace();
     	}
     }
-    public void sendBroadcast (MessageSys msgSys) {
-        /*DatagramSocket BroadcastSocket = new DatagramSocket();
-        BroadcastSocket.setBroadcast(true);
-        String message_sys = new String(constructMessageSystem());
-        DatagramPacket message_broadcasted = new DatagramPacket();*/
+    public void sendBroadcast (MessageSys msgSys) throws SocketException, UnknownHostException {
+        this.sock.setBroadcast(true);
+        UDPserializeSend(msgSys, InetAddress.getByName("255.255.255.255"));
+        this.sock.setBroadcast(false); //Pas forcement utile
     }
 }
