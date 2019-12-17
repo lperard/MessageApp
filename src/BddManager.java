@@ -5,7 +5,7 @@ import java.sql.*;
 public class BddManager implements Observable {
 
     private Connection bdd_connection;
-    private Statement bdd_statement; 
+    private Statement bdd_statement;
     protected ArrayList<User> connected_users;
     protected User local_user;
     protected ArrayList<Observer> listObserver;
@@ -13,6 +13,16 @@ public class BddManager implements Observable {
     public BddManager() {
         this.bdd_connection = null;
         this.bdd_statement = null;
+
+        try {
+          Class.forName("org.sqlite.JDBC");
+          this.bdd_connection = DriverManager.getConnection("jdbc:sqlite:test.db");
+          this.bdd_statement = this.bdd_connection.createStatement();
+        } catch ( Exception e ) {
+          System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+          System.exit(0);
+        }
+        System.out.println("Opened database successfully");
 
         this.connected_users = new ArrayList<User>();
         try {
@@ -31,7 +41,7 @@ public class BddManager implements Observable {
         // Faut-il notifier qqch à la view ici ???
     }
 
-    public User getLocalUser(User target) {
+    public User getLocalUser() {
         return this.local_user;
     }
 
@@ -55,29 +65,28 @@ public class BddManager implements Observable {
         String dest_address = dest.getHostAddress();
         String source_reformatted = source_address.replace('.','_');
         String dest_reformatted = dest_address.replace('.','_');
-        String data_str = new String(data);       
+        String data_str = new String(data);
 
         try {
 
-            Class.forName("org.sqlite.JDBC");
-            this.bdd_connection = DriverManager.getConnection("jdbc:sqlite:test.db");
+            // ON TEST SI ON PEUT OUVRIR LA CONNECTION A LA BDD JUSTE UNE FOIS DANS LE CONSTRUCTEUR
+            /*Class.forName("org.sqlite.JDBC");
+            this.bdd_connection = DriverManager.getConnection("jdbc:sqlite:app.db");
             System.out.println("Opened database successfully");
 
-            this.bdd_statement = this.bdd_connection.createStatement();
+            this.bdd_statement = this.bdd_connection.createStatement();*/
 
-            if(local_user.getId() == source) {
-                
+            if(local_user.getId().equals(source)) {
+
                 sql = "create table if not exists LOG_"+ dest_reformatted +" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(100), timestamp VARCHAR(20))";
-                System.out.println(sql);
                 this.bdd_statement.executeUpdate(sql);
 
                 sql = "insert into LOG_"+ dest_reformatted +" (source,dest,data,timestamp) values ('"+ source_address +"', '"+ dest_address +"', '"+data_str+"', '"+timestamp+"');";
-                System.out.println(sql);
                 this.bdd_statement.executeUpdate(sql);
-        
+
                 notifyObserver("new_message_to_"+ dest_address);
             }
-            else if(local_user.getId() == dest) {
+            else if(local_user.getId().equals(dest)) {
                 sql = "create table if not exists LOG_"+ source_reformatted +" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(100), timestamp VARCHAR(20))";
                  this.bdd_statement.executeUpdate(sql);
 
@@ -86,7 +95,7 @@ public class BddManager implements Observable {
 
                 notifyObserver("new_message_from_"+ source_address);
             }
-            
+
         } catch (Exception e) {
             System.err.println(e.getClass().getName()+":"+e.getMessage());
             System.exit(0);
@@ -97,16 +106,16 @@ public class BddManager implements Observable {
         ResultSet rs = null;
         String target_address = target.getHostAddress();
         String target_reformatted = target_address.replace('.','_');
-         
+
         Log log = new Log();
-       
-        try {        
+
+        try {
             String sql = "create table if not exists LOG_"+ target_reformatted +" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(100), timestamp VARCHAR(20))";
             this.bdd_statement.executeUpdate(sql);
 
             sql = "select * from LOG_"+ target_reformatted +";";
             rs = this.bdd_statement.executeQuery(sql);
-            
+
             while(rs.next()) {
                 String source = rs.getString("source");
                 String dest = rs.getString("dest");
@@ -125,10 +134,10 @@ public class BddManager implements Observable {
             System.err.println(e.getClass().getName()+":"+e.getMessage());
             System.exit(0);
         }
-        
+
         return log;
     }
-    
+
     // Implémentation du pattern observable
     public void addObserver(Observer obs) {
         this.listObserver.add(obs);
@@ -143,4 +152,3 @@ public class BddManager implements Observable {
             obs.update(str);
     }
 }
-

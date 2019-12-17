@@ -6,6 +6,10 @@ import java.io.ObjectOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 
+// A ENLEVER A TERME C EST POUR LES TESTS
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
+
 public class SendManager implements Runnable{
 
     private DatagramSocket sock;
@@ -19,14 +23,18 @@ public class SendManager implements Runnable{
             System.out.println("Ca bug");
         }
     }
+
     public void run() {
         System.out.println("Lancement du thread d'envoi");
-        MessageSys msg_sys = null;
+        Message msg = null;
         try {
-            InetAddress ip = InetAddress.getLocalHost(); //Envoi à soi même
-            User user = new User(ip, "Didiax");
-            msg_sys = new MessageSys(Type.Hello,user);
-            //String message = msg_sys.constructMessageSystem();        
+            InetAddress ip = InetAddress.getLocalHost(); //Envoi à soi
+            byte[] data = "Salut !".getBytes();
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+            LocalDateTime now = LocalDateTime.now();
+            String timestamp = new String(dtf.format(now));
+            msg = new Message(ip,ip,data,timestamp);
+            //String message = msg_sys.constructMessageSystem();
             //System.out.println(message);
         }
         catch (UnknownHostException e) {
@@ -34,22 +42,24 @@ public class SendManager implements Runnable{
         }
         Scanner input = new Scanner(System.in);
         ByteArrayOutputStream outByte = null;
-        while(true) {
+
+        boolean haventSendYet = true;
+        while(haventSendYet) {
             //String msg = input.nextLine();
-            try{ 
-                InetAddress host = InetAddress.getLocalHost();
-    			outByte = new ByteArrayOutputStream();
-                //DatagramPacket out = new DatagramPacket(msg.getBytes(), msg.length(), host, port);
-                byte[] objectSerialized = null;
-                ObjectOutputStream objOut = new ObjectOutputStream(outByte);
-            	objOut.writeObject(msg_sys); //envoi de l'objet serializé
+            try{
+              InetAddress host = InetAddress.getLocalHost();
+    			    outByte = new ByteArrayOutputStream();
+              //DatagramPacket out = new DatagramPacket(msg.getBytes(), msg.length(), host, port);
+              byte[] objectSerialized = null;
+              ObjectOutputStream objOut = new ObjectOutputStream(outByte);
+            	objOut.writeObject(msg); //envoi de l'objet serializé
             	objectSerialized = outByte.toByteArray();
             	DatagramPacket objPacket = new DatagramPacket(objectSerialized, objectSerialized.length, host, this.port);
-                try{sock.send(objPacket);}
-                catch (IOException io) {
-                    System.out.println("Ca rebug");
-                }
-                }
+              try{sock.send(objPacket); haventSendYet = false;}
+              catch (IOException io) {
+                System.out.println("Ca rebug");
+              }
+            }
             //https://www.javaworld.com/article/2077539/java-tip-40--object-transport-via-datagram-packets.html
             catch (UnknownHostException uhe) {
                 System.out.println("Oula");
@@ -58,8 +68,8 @@ public class SendManager implements Runnable{
 				e.printStackTrace();
 			}
         }
-        
-        
+
+
         //sock.close();
         //input.close();
     }
