@@ -49,8 +49,6 @@ public class SendManager implements Runnable{
 			}
         	
         }
-        
-        
         //sock.close();
         //input.close()
     }
