@@ -55,7 +55,7 @@ public class SendManager implements Runnable{
             	objOut.writeObject(msg); //envoi de l'objet serializé
             	objectSerialized = outByte.toByteArray();
             	DatagramPacket objPacket = new DatagramPacket(objectSerialized, objectSerialized.length, host, this.port);
-              try{sock.send(objPacket); haventSendYet = false;}
+              try{sock.send(objPacket); haventSendYet = false; System.out.println("J'ai envoyé un message !");}
               catch (IOException io) {
                 System.out.println("Ca rebug");
               }

@@ -66,6 +66,7 @@ public class ReceiveManager implements Runnable{
                 	}
                 	else if (o.getClass().toString().compareTo("class Message") == 0){
                 		Message message_received = (Message) o;
+                    System.out.println("J'ai reçu un message !");
                 		processReceivedDataMsg(message_received);
                 	}
                 	else {
