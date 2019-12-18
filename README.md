@@ -20,7 +20,12 @@ To run :
 
 ## What's working :
 
-For now we can locally send both a "classic" message and add it to our local BDD and a "system" message, in our example we chose a "Hello" message indicating that a new user just connected and we add it to the list of connected users.
+For now we can locally send both "classic" messages and add them to our local BDD (based on Sqlite) and "system" messages.
+
+In our current Main we send 3 messages :
+- a "classic" message that we add to the BDD (we display the BDD contents on reception)
+- a "Hello" system message indicating that a new user just connected, we add the user to the list of online users and then display that list
+- a "Goodbye" system message indicating that an user just disconnected, we delete the user from the list of online users and then display that list again
 
 ## Authors :
 
