@@ -13,7 +13,14 @@ public class SocketManager {
     this.sendPort=sendPort;
     this.receivePort=receivePort;
 
-    this.sendM=new SendManager(sendPort);
+    try{
+        InetAddress host = InetAddress.getLocalHost();
+        this.sendM=new SendManager(sendPort, host);
+    }
+    catch (Exception e){
+        System.out.println("Unknown Host Address !\n");
+        System.exit(0);
+    }
     this.receiveM=new ReceiveManager(receivePort,model);
 
     Thread send = new Thread(sendM);

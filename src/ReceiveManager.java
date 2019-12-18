@@ -32,15 +32,15 @@ public class ReceiveManager implements Runnable{
         }
 
         public void processReceivedDataMsg(Message msg) {
-          InetAddress source = msg.getSource();
-          InetAddress dest = msg.getDest();
-          byte[] data = msg.getData();
-          String timestamp = msg.getTimestamp();
-          this.model.addMessage(source,dest,data,timestamp);
+            InetAddress source = msg.getSource();
+            InetAddress dest = msg.getDest();
+            byte[] data = msg.getData();
+            String timestamp = msg.getTimestamp();
+            this.model.addMessage(source,dest,data,timestamp);
         }
 
         public void processReceivedDataSys(MessageSys msys) {
-
+            
         }
 
         public void run() {
