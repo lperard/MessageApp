@@ -6,6 +6,10 @@ import java.io.ObjectOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 
+// A ENLEVER A TERME C EST POUR LES TESTS
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
+
 public class SendManager implements Runnable{
 
     private DatagramSocket sock;
@@ -18,46 +22,40 @@ public class SendManager implements Runnable{
         this.port = port;
         this.addr_distant = addr_distant;
         try {this.sock = new DatagramSocket();}
-        catch (SocketException e) {
-            System.out.println("Ca bug");
+        catch (Exception e) {
+            System.err.println(e.getClass().getName()+":"+e.getMessage());
+            System.exit(0);
         }
     }
+
     public void run() {
         System.out.println("Lancement du thread d'envoi");
-        MessageSys msg_sys = null;
+        Message msg = null;
         try {
-            InetAddress ip = InetAddress.getLocalHost(); //Envoi à soi même
-            User user = new User(ip, "Didiax");
-            msg_sys = new MessageSys(Type.Hello,user);
+            InetAddress ip = InetAddress.getLocalHost(); //Envoi à soi
+            byte[] data = "Salut !".getBytes();
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+            LocalDateTime now = LocalDateTime.now();
+            String timestamp = new String(dtf.format(now));
+            msg = new Message(ip,ip,data,timestamp);
+            
+            boolean haventSendYet = true;
+            while(haventSendYet) {
+                UDPserializeSend(msg,ip);
+                haventSendYet = false;
+                System.out.println("J'ai envoyé un message !");
+            }
         }
-        catch (UnknownHostException e) {
-            e.printStackTrace();
+        catch (Exception e) {
+            System.err.println(e.getClass().getName()+":"+e.getMessage());
+            System.exit(0);
         }
-        Scanner input = new Scanner(System.in);
-        while(true) {
-        	try{
-        		Thread.sleep(1000);
-        		//UDPserializeSend(msg_sys, this.addr_distant);
-        		sendBroadcast(msg_sys);
-        	}
-        	catch (InterruptedException e) {
-        		e.printStackTrace();
-        	} catch (SocketException e) {
-				e.printStackTrace();
-			} catch (UnknownHostException e) {
-				e.printStackTrace();
-			}
-        	
-        }
-        //sock.close();
-        //input.close()
     }
 
     private void UDPserializeSend (Object obj, InetAddress distant) {
     	ByteArrayOutputStream outByte = null;
     	try{ 
 			outByte = new ByteArrayOutputStream();
-            //DatagramPacket out = new DatagramPacket(msg.getBytes(), msg.length(), host, port);
             byte[] objectSerialized = null;
             ObjectOutputStream objOut = new ObjectOutputStream(outByte);
         	objOut.writeObject(obj); //envoi de l'objet serializé
@@ -80,6 +78,7 @@ public class SendManager implements Runnable{
     		e.printStackTrace();
     	}
     }
+
     public void sendBroadcast (MessageSys msgSys) throws SocketException, UnknownHostException {
         this.sock.setBroadcast(true);
         UDPserializeSend(msgSys, InetAddress.getByName("255.255.255.255"));
