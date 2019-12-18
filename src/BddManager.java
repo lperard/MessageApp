@@ -36,19 +36,31 @@ public class BddManager implements Observable {
     }
 
     public void addUser(User user) {
-        int index = this.connected_users.indexOf(user);
-        if(index==-1) {
-          this.connected_users.add(user);
-          notifyObserver("new_user_online");
+      boolean exists = false;
+      for(int i=0; i<this.connected_users.size();i++) {
+        User current = this.connected_users.get(i);
+        if(current.getId().equals(user.getId())) {
+          exists = true;
         }
+      }
+      if(!exists) {
+        this.connected_users.add(user);
+        notifyObserver("new_user_online");
+      }
     }
 
     public void rmUser(User user) {
-        int index = this.connected_users.indexOf(user);
-        if(index!=-1) {
-          this.connected_users.remove(index);
-          notifyObserver("new_user_offline");
+      int index = -1;
+      for(int i=0; i<this.connected_users.size();i++) {
+        User current = this.connected_users.get(i);
+        if(current.getId().equals(user.getId())) {
+          index = i;
         }
+      }
+      if(index!=-1) {
+        this.connected_users.remove(index);
+        notifyObserver("new_user_offline");
+      }
     }
 
     public ArrayList<User> getUserList() {

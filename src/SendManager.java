@@ -15,7 +15,7 @@ public class SendManager implements Runnable{
     private DatagramSocket sock;
 
     private int port;
-    
+
     private InetAddress addr_distant;
 
     public SendManager(int port, InetAddress addr_distant){
@@ -31,7 +31,8 @@ public class SendManager implements Runnable{
     public void run() {
         System.out.println("Lancement du thread d'envoi");
         Message msg = null;
-        MessageSys msg_sys = null;
+        MessageSys sys1 = null;
+        MessageSys sys2 = null;
         try {
             InetAddress ip = InetAddress.getLocalHost(); //Envoi à soi
             User user = new User(ip,"Test_User");
@@ -40,12 +41,14 @@ public class SendManager implements Runnable{
             LocalDateTime now = LocalDateTime.now();
             String timestamp = new String(dtf.format(now));
             msg = new Message(ip,ip,data,timestamp);
-            msg_sys = new MessageSys(Type.Hello,user);
-            
+            sys1 = new MessageSys(Type.Hello,user);
+            sys2 = new MessageSys(Type.Goodbye,user);
+
             boolean haventSendYet = true;
             while(haventSendYet) {
                 UDPserializeSend(msg,ip);
-                UDPserializeSend(msg_sys,ip);
+                UDPserializeSend(sys1,ip);
+                UDPserializeSend(sys2,ip);
                 haventSendYet = false;
                 System.out.println("J'ai envoyé mes messages !");
             }
@@ -58,7 +61,7 @@ public class SendManager implements Runnable{
 
     private void UDPserializeSend (Object obj, InetAddress distant) {
     	ByteArrayOutputStream outByte = null;
-    	try{ 
+    	try{
 			outByte = new ByteArrayOutputStream();
             byte[] objectSerialized = null;
             ObjectOutputStream objOut = new ObjectOutputStream(outByte);
