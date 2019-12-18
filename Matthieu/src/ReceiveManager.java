@@ -37,6 +37,21 @@ public class ReceiveManager implements Runnable{
             byte[] data = msg.getData();
             String timestamp = msg.getTimestamp();
             this.model.addMessage(source,dest,data,timestamp);
+
+            // A ENLEVER C EST JUSTE POUR LES TESTS
+            Log log = this.model.getMsgHistory(model.getLocalUser().getId());
+            ArrayList<Message> history = log.getHistory();
+            System.out.println("Contenu de la table LOG_"+ model.getLocalUser().getId().getHostAddress());
+            System.out.println("");
+            for(int i=0; i<history.size() ; i++) {
+
+                System.out.println("SOURCE = " + history.get(i).getSource().getHostAddress());
+                System.out.println("DEST = " + history.get(i).getDest().getHostAddress());
+                String data_str = new String(history.get(i).getData());
+                System.out.println("DATA = " + data_str);
+                System.out.println("TIME = " + history.get(i).getTimestamp());
+                System.out.println("");
+            }
         }
 
         public void processReceivedDataSys(MessageSys msys) {
@@ -54,6 +69,17 @@ public class ReceiveManager implements Runnable{
                 System.out.println("J'ai reçu un ChangePseudo !");  
                 this.model.addUser(user);
             }
+
+            // A ENLEVER C EST JUSTE POUR LES TESTS
+            ArrayList<User> connected_users = this.model.getUserList();
+            System.out.println("");
+            System.out.println("Voici la liste des utilisateurs connectés :");
+            for(int i=0;i<connected_users.size();i++) {
+                String pseudo = connected_users.get(i).getPseudo();
+                System.out.println(pseudo);
+            }
+            System.out.println("");
+
         }
 
         public void run() {
@@ -95,21 +121,6 @@ public class ReceiveManager implements Runnable{
             	
             	//System.out.println(message_sys_received.getType().toString());
             	//System.out.println(message_sys_received.constructMessageSystem());
-
-                // A ENLEVER C EST JUSTE POUR LES TESTS
-                Log log = model.getMsgHistory(model.getLocalUser().getId());
-                ArrayList<Message> history = log.getHistory();
-                System.out.println("Contenu de la table LOG_"+ model.getLocalUser().getId().getHostAddress());
-                System.out.println("");
-                for(int i=0; i<history.size() ; i++) {
-
-                    System.out.println("SOURCE = " + history.get(i).getSource().getHostAddress());
-                    System.out.println("DEST = " + history.get(i).getDest().getHostAddress());
-                    String data_str = new String(history.get(i).getData());
-                    System.out.println("DATA = " + data_str);
-                    System.out.println("TIME = " + history.get(i).getTimestamp());
-                    System.out.println("");
-                }
             }
             catch (IOException | ClassNotFoundException e) {
             	e.printStackTrace();
