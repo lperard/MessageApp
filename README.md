@@ -14,8 +14,8 @@ To compile : javac -d bin src/*.java
 
 To run :
 - Open 2 terminals
-- In the first terminal : java -cp "bin:lib/*" Main <Port1> <Port2>
-- In the second terminal : java -cp "bin:lib/*" Main <Port2> <Port1>
+- In the first terminal : java -cp "bin:lib/*" Main Port1 Port2
+- In the second terminal : java -cp "bin:lib/*" Main Port2 Port1
 
 ## What's working :
 
