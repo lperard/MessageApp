@@ -8,14 +8,14 @@ Download or git clone the project.
 
 ### Compiling:
 
-To compile : javac -d AppV1/bin AppV1/src/*.java
+To compile : javac -d bin src/*.java
 
 ### Running:
 
 To run :
 - Open 2 terminals
-- In the first terminal : java -cp AppV1/bin Main <Port1> <Port2>
-- In the second terminal : java -cp AppV1/bin Main <Port2> <Port1>
+- In the first terminal : java -cp "bin:lib/*" Main <Port1> <Port2>
+- In the second terminal : java -cp "bin:lib/*" Main <Port2> <Port1>
 
 ## What's working :
 
