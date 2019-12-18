@@ -44,8 +44,8 @@ public class SendManager implements Runnable{
             
             boolean haventSendYet = true;
             while(haventSendYet) {
-                UDPserializeSend(msg,ip);
-                UDPserializeSend(msg_sys,ip);
+                UDPserializeSend(msg,this.addr_distant);
+                UDPserializeSend(msg_sys,this.addr_distant);
                 haventSendYet = false;
                 System.out.println("J'ai envoyé mes messages !");
             }
