@@ -40,7 +40,20 @@ public class ReceiveManager implements Runnable{
         }
 
         public void processReceivedDataSys(MessageSys msys) {
-            
+            Type type = msys.getType();
+            User user = msys.getUser();
+            if(type.equals(Type.Hello)) {
+                System.out.println("J'ai reçu un Hello !");
+                this.model.addUser(user);
+            }
+            else if(type.equals(Type.Goodbye)) {
+                System.out.println("J'ai reçu un Goodbye !");
+                this.model.rmUser(user);
+            }
+            else if(type.equals(Type.ChangePseudo)) {
+                System.out.println("J'ai reçu un ChangePseudo !");  
+                this.model.addUser(user);
+            }
         }
 
         public void run() {
@@ -66,15 +79,14 @@ public class ReceiveManager implements Runnable{
             	/*InetAddress clientAddress = in.getAddress();
             	int clientPort = in.getPort();*/
             	Object o = inObj.readObject();
+                System.out.println("Reception d'un objet serializé");
             	//System.out.println(o.getClass().toString());
             	if (o.getClass().toString().compareTo("class MessageSys") == 0) {
-            		System.out.println("Reception d'un objet serializé");
             		MessageSys message_sys_received = (MessageSys) o;
             		processReceivedDataSys(message_sys_received);
             	}
             	else if (o.getClass().toString().compareTo("class Message") == 0){
             		Message message_received = (Message) o;
-            		System.out.println("J'ai reçu un message !");
                 	processReceivedDataMsg(message_received);
             	}
             	else {

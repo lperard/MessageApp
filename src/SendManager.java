@@ -31,19 +31,23 @@ public class SendManager implements Runnable{
     public void run() {
         System.out.println("Lancement du thread d'envoi");
         Message msg = null;
+        MessageSys msg_sys = null;
         try {
             InetAddress ip = InetAddress.getLocalHost(); //Envoi à soi
+            User user = new User(ip,"Test_User");
             byte[] data = "Salut !".getBytes();
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime now = LocalDateTime.now();
             String timestamp = new String(dtf.format(now));
             msg = new Message(ip,ip,data,timestamp);
+            msg_sys = new MessageSys(Type.Hello,user);
             
             boolean haventSendYet = true;
             while(haventSendYet) {
                 UDPserializeSend(msg,ip);
+                UDPserializeSend(msg_sys,ip);
                 haventSendYet = false;
-                System.out.println("J'ai envoyé un message !");
+                System.out.println("J'ai envoyé mes messages !");
             }
         }
         catch (Exception e) {
