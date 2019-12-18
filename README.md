@@ -4,7 +4,8 @@
 
 ### Prerequisites:
 
-Download or git clone the project.
+- Having a recent version of the JDK installed
+- Downloading this project or creating a copy with "git clone"
 
 ### Compiling:
 
