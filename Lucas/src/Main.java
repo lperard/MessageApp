@@ -6,9 +6,9 @@ public class Main {
 
     //int sendPort = Integer.parseInt(args[0]);
     //int receivePort = Integer.parseInt(args[1]);
-	  InetAddress distant;
+	  
 	try {
-		distant = InetAddress.getByName(args[0]);
+		InetAddress distant = InetAddress.getByName(args[0]);
 		
 		//Instanciation de notre modèle
 	    BddManager model = new BddManager();
