@@ -66,7 +66,8 @@ public class ReceiveManager implements Runnable{
                 this.model.rmUser(user);
             }
             else if(type.equals(Type.ChangePseudo)) {
-                System.out.println("J'ai reçu un ChangePseudo !");  
+                System.out.println("J'ai reçu un ChangePseudo !");
+                this.model.rmUser(user);
                 this.model.addUser(user);
             }
 
@@ -87,7 +88,7 @@ public class ReceiveManager implements Runnable{
             while(true) {
                 UDPserializedReceive();
             }
-        }        
+        }
 
         public void UDPserializedReceive () {
         	byte[] buffer = new byte[1024]; // préparation du buffer
@@ -118,7 +119,7 @@ public class ReceiveManager implements Runnable{
             	else {
             		System.out.println("On est dans les choux");
             	}
-            	
+
             	//System.out.println(message_sys_received.getType().toString());
             	//System.out.println(message_sys_received.constructMessageSystem());
             }
@@ -128,4 +129,3 @@ public class ReceiveManager implements Runnable{
             }
         }
 }
-
