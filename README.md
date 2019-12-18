@@ -14,8 +14,8 @@ To compile : javac -d AppV1/bin AppV1/src/*.java
 
 To run :
 - Open 2 terminals
-- In the first terminal : javac -cp AppV1/bin Main <Port1> <Port2>
-- In the second terminal : javac -cp AppV1/bin Main <Port2> <Port1>
+- In the first terminal : java -cp AppV1/bin Main <Port1> <Port2>
+- In the second terminal : java -cp AppV1/bin Main <Port2> <Port1>
 
 ## What's working :
 
