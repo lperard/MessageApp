@@ -1,16 +1,26 @@
+import java.net.*;
+
 public class Main {
 
   public static void main(String[] args) {
 
-    int sendPort = Integer.parseInt(args[0]);
-    int receivePort = Integer.parseInt(args[1]);
+    //int sendPort = Integer.parseInt(args[0]);
+    //int receivePort = Integer.parseInt(args[1]);
+	  InetAddress distant;
+	try {
+		distant = InetAddress.getByName(args[0]);
+		
+		//Instanciation de notre modèle
+	    BddManager model = new BddManager();
 
-    //Instanciation de notre modèle
-    BddManager model = new BddManager();
+	    //Création du contrôleur
+	    MainController controler = new MainController(model, distant);
 
-    //Création du contrôleur
-    MainController controler = new MainController(model,sendPort,receivePort);
-
+	} catch (UnknownHostException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+    
     //Création de notre fenêtre avec le contrôleur en paramètre
     //InterfaceManager view = new InterfaceManager(com);
 

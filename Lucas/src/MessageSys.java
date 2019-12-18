@@ -29,5 +29,8 @@ public class MessageSys implements Serializable {
     public Type getType() {
     	return this.type;
     }
+    public User getUser() {
+    	return this.user;
+    }
 
 }

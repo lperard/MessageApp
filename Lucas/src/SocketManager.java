@@ -9,13 +9,12 @@ public class SocketManager {
   protected SendManager sendM;
   protected ReceiveManager receiveM;
 
-  public SocketManager(BddManager model, int sendPort, int receivePort) {
-    this.sendPort=sendPort;
-    this.receivePort=receivePort;
+  public SocketManager(BddManager model, InetAddress distant) {
+    this.sendPort = 5000;
+    this.receivePort = 5000;
 
-    try{
-        InetAddress host = InetAddress.getLocalHost();
-        this.sendM=new SendManager(sendPort, host);
+    try{;
+        this.sendM = new SendManager(sendPort, distant);
     }
     catch (Exception e){
         System.out.println("Unknown Host Address !\n");

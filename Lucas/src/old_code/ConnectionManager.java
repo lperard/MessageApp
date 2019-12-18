@@ -15,16 +15,14 @@ public class ConnectionManager{
         int lastConnected = 0;
         Sock newSock = new Sock(new Socket("127.0.0.1",connectionPort), connectionPort);
         connectionPort++;
-        socketHashMap.put(lastConnected,newSock);
+        //socketHashMap.put(lastConnected,newSock);
         while (true) {
-            if (socketHashMap.get(lastConnected).connected == true){
+            //if (socketHashMap.get(lastConnected).connected == true){
             lastConnected++;            
-            socketHashMap.put(lastConnected,new Sock(new Socket("127.0.0.1",connectionPort), connectionPort));
+            //socketHashMap.put(lastConnected,new Sock(new Socket("127.0.0.1",connectionPort), connectionPort));
             connectionPort++;
             }
         }
         
     }
 
-    
-}
