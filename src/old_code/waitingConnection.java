@@ -3,7 +3,7 @@ import java.io.*;
 
 
 public class waitingConnection {
-    public static void main (String[] args)throws IOException {
+    /*public static void main (String[] args)throws IOException {
         
         Sock sock = new Sock();
         Sock.connectdingToServer();
@@ -27,7 +27,7 @@ public class waitingConnection {
         BufferedReader InputBuff = new BufferedReader(new InputStreamReader(linkServ.getInputStream()));
         PrintWriter out = new PrintWriter(linkServ.getOutputStream(),true);
         System.out.println("Streams en place\n");*/
-    }
+    /*}
     
     private void connectingToServer () {
         setupConnection("127.0.0.1", 49152);
@@ -45,7 +45,7 @@ public class waitingConnection {
         /*linkServ.close();
         InputBuff.close();
         out.close();*/
-    }
+   /* }
 
 
 

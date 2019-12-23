@@ -8,6 +8,7 @@ public class SocketManager {
   private int receivePort;
   protected SendManager sendM;
   protected ReceiveManager receiveM;
+  private TCPManager tcpM;
 
   public SocketManager(BddManager model, int sendPort, int receivePort) {
     this.sendPort=sendPort;
@@ -21,7 +22,7 @@ public class SocketManager {
         System.out.println("Unknown Host Address !\n");
         System.exit(0);
     }
-    this.receiveM=new ReceiveManager(receivePort,model);
+    this.receiveM = new ReceiveManager(receivePort,model);
 
     Thread send = new Thread(sendM);
     send.start();
