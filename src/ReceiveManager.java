@@ -39,9 +39,9 @@ public class ReceiveManager implements Runnable{
             this.model.addMessage(source,dest,data,timestamp);
 
             // A ENLEVER C EST JUSTE POUR LES TESTS
-            Log log = this.model.getMsgHistory(model.getLocalUser().getId());
+            Log log = this.model.getMsgHistory(model.getLocalUser().getIp());
             ArrayList<Message> history = log.getHistory();
-            System.out.println("Contenu de la table LOG_"+ model.getLocalUser().getId().getHostAddress());
+            System.out.println("Contenu de la table LOG_"+ model.getLocalUser().getIp().getHostAddress());
             System.out.println("");
             for(int i=0; i<history.size() ; i++) {
 

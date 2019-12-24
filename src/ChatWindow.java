@@ -1,105 +1,162 @@
 import javax.swing.*;
+import javax.swing.border.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.time.format.DateTimeFormatter;
-import java.time.LocalDateTime;
+import java.net.InetAddress;
 
-public class ChatWindow extends JFrame {
+public class ChatWindow extends JFrame implements Observer {
 
-    private static String LOOKANDFEEL = "GTK+";
+    private MainController controler;
 
-    private JButton send_button = new JButton("Send");
-    private JTextField msg_to_send = new JTextField();
-    private JLabel current_msg = new JLabel();
+    private JPanel users = new JPanel();
+    private JPanel chat = new JPanel();
+
+    private JPanel pseudoPane = new JPanel();
     private JLabel current_pseudo = null;
-    private JButton change_pseudo_button = new JButton("Change pseudo");
+    private JButton change_pseudo_button = new JButton("Changer de pseudo");
 
+    private JPanel listPane = new JPanel();
+    private JLabel online_users = new JLabel("Utilisateurs en ligne:", SwingConstants.CENTER);
+    private JScrollPane scrollPane = new JScrollPane();
+    private JList<String> user_list = null;
 
-    public ChatWindow(String name/*, String current_pseudo*/) {
-        super(name);
-        //this.current_pseudo = new JLabel(current_pseudo);
+    private JTabbedPane history = new JTabbedPane();
+
+    public ChatWindow(MainController controler, String current_pseudo) {
+        this.controler = controler;
+        this.controler.getModel().addObserver(this);
+
+        this.user_list = new JList<String>(this.controler.getModel().getPseudoList());
+        this.user_list.setCellRenderer(new UserListLabel());
+        this.current_pseudo = new JLabel("Connecté en tant que "+current_pseudo, SwingConstants.CENTER);
+        this.history.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+
+        this.showGUI();
     }
 
-    private static void initLookAndFeel() {
-        String lookAndFeel = null;
+    public void addComponentsToPanes() {
+      users.setLayout(new BorderLayout(20,20));
+      users.add(pseudoPane, BorderLayout.PAGE_START);
+      users.add(listPane, BorderLayout.CENTER);
+      users.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 
-        if(LOOKANDFEEL != null) {
-            if(LOOKANDFEEL.equals("Metal")) {
-                lookAndFeel = UIManager.getCrossPlatformLookAndFeelClassName();
-            }
-            else if (LOOKANDFEEL.equals("System")) {
-                lookAndFeel = UIManager.getSystemLookAndFeelClassName();
-            }
-            else if (LOOKANDFEEL.equals("Motif")) {
-                lookAndFeel = "com.sun.java.swing.plaf.motif.MotifLookAndFeel";
-            }
-            else if (LOOKANDFEEL.equals("GTK+")) {
-                lookAndFeel = "com.sun.java.swing.plaf.gtk.GTKLookAndFeel";
-            }
-            else {
-                System.err.println("Unexpected value of LOOKANDFEEL specified: " + LOOKANDFEEL);
-                lookAndFeel = UIManager.getCrossPlatformLookAndFeelClassName();
-            }
+      pseudoPane.setLayout(new BorderLayout(10,10));
+      current_pseudo.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+      pseudoPane.add(current_pseudo, BorderLayout.PAGE_START);
+      pseudoPane.add(change_pseudo_button, BorderLayout.CENTER);
 
-            try {
-                UIManager.setLookAndFeel(lookAndFeel);
-            } catch (ClassNotFoundException e) {
-                System.err.println("Couldn't find class for specified look and feel:"
-                        + lookAndFeel);
-                System.err.println("Did you include the L&F library in the class path?");
-                System.err.println("Using the default look and feel.");
-            } catch (UnsupportedLookAndFeelException e) {
-                System.err.println("Can't use the specified look and feel ("
-                        + lookAndFeel
-                        + ") on this platform.");
-                System.err.println("Using the default look and feel.");
-            } catch (Exception e) {
-                System.err.println("Couldn't get specified look and feel ("
-                        + lookAndFeel
-                        + "), for some reason.");
-                System.err.println("Using the default look and feel.");
-                e.printStackTrace();
+      listPane.setLayout(new BorderLayout(10,10));
+      online_users.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+      listPane.add(online_users, BorderLayout.PAGE_START);
+      listPane.add(scrollPane, BorderLayout.CENTER);
+
+      scrollPane.setViewportView(user_list);
+      user_list.setLayoutOrientation(JList.VERTICAL);
+      user_list.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+
+      user_list.addMouseListener(new MouseAdapter() {
+        public void mouseClicked(MouseEvent e) {
+          String selectedItem = (String) user_list.getSelectedValue();
+          int tabExists = -1;
+          for(int i = 0; i<history.getTabCount(); i++) {
+            if(history.getTitleAt(i).equals(selectedItem)) {
+              tabExists = i;
             }
+          }
+          if(tabExists==-1) {
+            InetAddress tab_ip = controler.getModel().getIpFromPseudo(selectedItem);
+            UserTabPane historyPane = new UserTabPane(history,controler,tab_ip);
+            history.addTab(selectedItem,historyPane);
+            history.setTabComponentAt(history.getTabCount()-1,new ButtonTabComponent(history));
+            history.setSelectedIndex(history.getTabCount()-1);
+          }
+          else {
+            history.setSelectedIndex(tabExists);
+          }
         }
+      });
+
+      change_pseudo_button.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            controler.getModel().removeObserver();
+            dispose();
+            LoginWindow login = new LoginWindow(controler,true);
+          }
+      });
+
+      chat.setLayout(new BoxLayout(chat, BoxLayout.PAGE_AXIS));
+      chat.add(history);
+
     }
 
-    public void addComponentsToPane(final Container pane) {
-    	/*DateTimeFormatter date = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-    	LocalDateTime now = LocalDateTime.now();
-    	JLabel msg_format = new JLabel(now+current_msg);
+    public void showGUI() {
+        this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        this.addWindowListener(new java.awt.event.WindowAdapter() {
+          @Override
+          public void windowClosing(java.awt.event.WindowEvent e) {
+            controler.disconnect();
+            e.getWindow().dispose();
+          }
+        });
 
+        this.setTitle("MessageApp");
+        this.setSize(new Dimension(1000, 500));
+        this.setResizable(false);
+        this.setLocationRelativeTo(null);
 
-    	pane.setLayout(new BoxLayout(pane, BoxLayout.PAGE_AXIS));
-        JPanel toppane = new JPanel();
-        toppane.add(Box.createRigidArea(new Dimension(0,1)));
-        toppane.add(current_msg);
+        this.setLayout(new BorderLayout());
+        users.setPreferredSize(new Dimension(300, 500));
+        chat.setPreferredSize(new Dimension(700, 500));
+        this.add(users, BorderLayout.LINE_START);
+        this.add(chat, BorderLayout.LINE_END);
 
-        //toppane.add(labelPseudo);
-        //toppane.add(textPseudo);
-        //textPseudo.setPreferredSize(new Dimension(150,25));
-        pane.add(toppane);
+        this.addComponentsToPanes();
 
-        JPanel but = new JPanel();
-        but.add(Box.createRigidArea(new Dimension(0,1)));
-        but.add(send_button);
-        pane.add(but);
+        this.pack();
+        this.setVisible(true);
+    }
 
-        send_button.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+    // Implémentation du pattern observer
+    public void update(String str) {
+      System.out.println(str);
+      if(str.equals("new_user_online") || str.equals("new_user_offline")) {
+        user_list.setListData(controler.getModel().getPseudoList());
+      }
+      else if(str.contains("new_message_to_")) {
+        String tmp = str.replace("new_message_to_","");
+        tmp = tmp.replace("_",".");
+        try {
+          InetAddress tmp_address = InetAddress.getByName(tmp);
+          for(int i=0; i<history.getTabCount(); i++) {
+            UserTabPane tab = (UserTabPane) history.getComponentAt(i);
+            if(tab.getUserIp().getHostAddress().equals(tmp)) {
+              UserTabPane new_tab = new UserTabPane(history, controler, tmp_address);
+              history.setComponentAt(i,new_tab);
             }
-        });*/
+          }
+        }
+        catch (Exception e) {
+          System.err.println(e.getClass().getName()+":"+e.getMessage());
+          System.exit(0);
+        }
+      }
+      else if(str.contains("new_message_from_")) {
+        String tmp = str.replace("new_message_from_","");
+        tmp = tmp.replace("_",".");
+        try {
+          InetAddress tmp_address = InetAddress.getByName(tmp);
+          for(int i=0; i<history.getTabCount(); i++) {
+            UserTabPane tab = (UserTabPane) history.getComponentAt(i);
+            if(tab.getUserIp().getHostAddress().equals(tmp)) {
+              UserTabPane new_tab = new UserTabPane(history, controler, tmp_address);
+              history.setComponentAt(i,new_tab);
+            }
+          }
+        }
+        catch (Exception e) {
+          System.err.println(e.getClass().getName()+":"+e.getMessage());
+          System.exit(0);
+        }
+      }
     }
-
-    public static void createAndShowGUI(/*String pseudo*/) {
-        initLookAndFeel();
-        JFrame.setDefaultLookAndFeelDecorated(true);
-        ChatWindow frame = new ChatWindow("MessageApp"/*,pseudo*/);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setPreferredSize(new Dimension(640, 480));
-
-        frame.addComponentsToPane(frame.getContentPane());
-        frame.pack();
-        frame.setVisible(true);
-    }
-
 }

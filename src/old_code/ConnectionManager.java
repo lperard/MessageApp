@@ -11,7 +11,7 @@ public class ConnectionManager{
         this.socketHashMap = new HashMap<Integer, Sock>();
     }
 
-    /*public static void main (String[] args) throws UnknownHostException,IOException{
+    public static void main (String[] args) throws UnknownHostException,IOException{
         int lastConnected = 0;
         Sock newSock = new Sock(new Socket("127.0.0.1",connectionPort), connectionPort);
         connectionPort++;
@@ -24,7 +24,7 @@ public class ConnectionManager{
             }
         }
         
-    }*/
+    }
 
     
 }

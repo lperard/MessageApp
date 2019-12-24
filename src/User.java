@@ -2,14 +2,14 @@ import java.net.*;
 import java.io.Serializable;
 public class User implements Serializable {
     private static final long serialVersionUID = 2222L;
-    protected InetAddress id;
+    protected InetAddress ip;
     protected String pseudo;
     protected boolean connected;
-    
-    public User(InetAddress id, String pseudo) {
-        this.id = id;
+
+    public User(InetAddress ip, String pseudo) {
+        this.ip = ip;
         this.pseudo = pseudo;
-        this.connected = false;        
+        this.connected = false;
     }
 
     public void setPseudo(String pseudo) {
@@ -29,16 +29,15 @@ public class User implements Serializable {
     }
 
     public void setId(InetAddress ip) {
-        this.id = ip;
+        this.ip = ip;
     }
 
-    public InetAddress getId() {
-        return this.id;
+    public InetAddress getIp() {
+        return this.ip;
     }
-    
+
     public String toString () {
-        String print = id.getHostAddress() + " " + pseudo;
-        return print; 
+        String print = ip.getHostAddress() + " " + pseudo;
+        return print;
     }
 }
-
