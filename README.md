@@ -13,10 +13,7 @@ To compile : javac -d bin src/*.java
 
 ### Running:
 
-To run :
-- Open 2 terminals
-- In the first terminal : java -cp "bin:lib/*" Main Port1 Port2
-- In the second terminal : java -cp "bin:lib/*" Main Port2 Port1
+To run : java -cp "img:bin:lib/*" Main
 
 ## What's working :
 
