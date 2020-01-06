@@ -1,3 +1,7 @@
+package Controller;
+
+import Model.BddManager;
+
 import java.lang.*;
 import java.net.*;
 import java.io.*;
@@ -23,13 +27,11 @@ public class SocketManager {
     }
     this.receiveM = new ReceiveManager(receivePort,model,this.sendM);
 
-    /*Thread send = new Thread(sendM);
-    send.start();*/
     Thread receive = new Thread(receiveM);
     receive.start();
     System.out.println("On a lancé les threads");
   }
-  
+
   public SendManager getSendManager() {
 	  return this.sendM;
   }

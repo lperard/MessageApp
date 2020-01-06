@@ -1,3 +1,10 @@
+package View;
+
+import Controller.MainController;
+import Controller.Message;
+import Model.User;
+import Model.Log;
+
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
@@ -249,7 +256,7 @@ public class ChatWindow extends JFrame implements Observer {
 
     private class UserListLabel extends JLabel implements ListCellRenderer<String> {
 
-      private final String icon = "img/user_icon.png";
+      private final String icon = "../../img/user_icon.png";
 
       public UserListLabel() {
         this.setOpaque(true);

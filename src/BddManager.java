@@ -1,3 +1,8 @@
+package Model;
+
+import Controller.Message;
+import View.Observer;
+
 import java.util.ArrayList;
 import java.net.*;
 import java.sql.*;

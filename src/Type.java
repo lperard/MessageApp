@@ -1,3 +1,5 @@
+package Controller;
+
 public enum Type {
     Hello("HELLO"),
     Connected("CNNTD"),

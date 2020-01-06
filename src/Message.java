@@ -1,3 +1,5 @@
+package Controller;
+
 import java.io.Serializable;
 import java.net.*;
 import java.util.*;
@@ -5,15 +7,15 @@ import java.text.SimpleDateFormat;
 import java.text.DateFormat;
 
 public class Message implements Serializable{
-    
+
 	private static final long serialVersionUID = 1111L;
-    
+
 	protected InetAddress source;
-    
+
 	protected InetAddress dest;
-    
+
 	protected byte[] data;
-    
+
 	protected String timestamp;
 
     public Message(InetAddress source, InetAddress dest, byte[] data, String timestamp) {
@@ -23,7 +25,7 @@ public class Message implements Serializable{
         if(timestamp != null) {
             this.timestamp = timestamp;
         }
-        else {        
+        else {
             DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
             Date date = new Date();
             this.timestamp = dateFormat.format(date);
@@ -47,4 +49,3 @@ public class Message implements Serializable{
     }
 
 }
-

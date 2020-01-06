@@ -1,8 +1,12 @@
+package Controller;
+
+import Model.User;
+
 import java.io.Serializable;
 public class MessageSys implements Serializable {
-	
+
 	private static final long serialVersionUID = 3333L;
-	
+
 	private Type type;
 
     private User user;
@@ -25,7 +29,7 @@ public class MessageSys implements Serializable {
     message += this.user.toString();
     return message;
     }
-    
+
     public Type getType() {
     	return this.type;
     }

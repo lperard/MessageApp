@@ -1,3 +1,7 @@
+package Model;
+
+import Controller.Message;
+
 import java.util.ArrayList;
 
 public class Log {
@@ -13,4 +17,3 @@ public class Log {
     }
 
 }
-

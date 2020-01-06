@@ -1,10 +1,11 @@
+package View;
+
+import Controller.MainController;
+
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
 import java.awt.event.*;
-
-// A ENLEVER C EST POUR LES TESTS
-import java.net.InetAddress;
 
 public class LoginWindow extends JFrame implements Observer {
 
@@ -21,11 +22,6 @@ public class LoginWindow extends JFrame implements Observer {
     private JLabel online_users = new JLabel("Utilisateurs en ligne:", SwingConstants.CENTER);
     private JScrollPane scrollPane = new JScrollPane();
     private JList<String> user_list = null;
-
-    // POUR LES TESTS
-    private JPanel test_user = new JPanel();
-    private JButton add_user = new JButton("+");
-    private JButton rm_user = new JButton("-");
 
     public LoginWindow(MainController controler, boolean alreadyConnected) {
       this.alreadyConnected = alreadyConnected;

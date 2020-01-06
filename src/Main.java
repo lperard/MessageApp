@@ -1,3 +1,7 @@
+import View.*;
+import Model.*;
+import Controller.*;
+
 import javax.swing.*;
 import java.net.*;
 
@@ -11,7 +15,7 @@ public class Main {
 	int receivePort = 6000;
 
     //Récupération de notre IP sur le réseau local
-    InetAddress my_address = null; 
+    InetAddress my_address = null;
     try {
         DatagramSocket sock = new DatagramSocket(8888);
         sock.connect(new InetSocketAddress("8.8.8.8", 8888));
