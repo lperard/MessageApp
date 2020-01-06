@@ -44,42 +44,7 @@ public class LoginWindow extends JFrame implements Observer {
         user_list.setLayoutOrientation(JList.VERTICAL);
         users.add(online_users, BorderLayout.PAGE_START);
         users.add(scrollPane, BorderLayout.CENTER);
-        users.add(test_user, BorderLayout.PAGE_END); // A ENLEVER, TEST
         users.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
-
-        // POUR LES TESTS
-        test_user.setLayout(new BoxLayout(test_user, BoxLayout.LINE_AXIS));
-        test_user.add(Box.createRigidArea(new Dimension(10,0)));
-        test_user.add(add_user);
-        test_user.add(Box.createRigidArea(new Dimension(10,0)));
-        test_user.add(rm_user);
-        test_user.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-
-        // POUR LES TESTS
-        add_user.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-              try {
-                InetAddress address = InetAddress.getByName("190.168.120.200");
-                controler.getModel().addUser(new User(address,"Test User"));
-              } catch (Exception ex) {
-                System.err.println(ex.getClass().getName()+":"+ex.getMessage());
-                System.exit(0);
-              }
-            }
-        });
-
-        // POUR LES TESTS
-        rm_user.addActionListener(new ActionListener() {
-          public void actionPerformed(ActionEvent e) {
-            try {
-              InetAddress address = InetAddress.getByName("190.168.120.200");
-              controler.getModel().rmUser(new User(address,"Test User"));
-            } catch (Exception ex) {
-              System.err.println(ex.getClass().getName()+":"+ex.getMessage());
-              System.exit(0);
-            }
-          }
-        });
 
         login.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();

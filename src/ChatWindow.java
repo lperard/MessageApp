@@ -2,7 +2,8 @@ import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.net.InetAddress;
+import java.net.*;
+import java.util.ArrayList;
 
 public class ChatWindow extends JFrame implements Observer {
 
@@ -158,5 +159,292 @@ public class ChatWindow extends JFrame implements Observer {
           System.exit(0);
         }
       }
+    }
+
+    private class ButtonTabComponent extends JPanel {
+      private final JTabbedPane pane;
+
+      public ButtonTabComponent(final JTabbedPane pane) {
+        super(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        if (pane == null) {
+          throw new NullPointerException("JTabbedPane is null");
+        }
+        this.pane = pane;
+        setOpaque(false);
+
+        JLabel label = new JLabel() {
+          public String getText() {
+            int i = pane.indexOfTabComponent(ButtonTabComponent.this);
+            if (i!=-1) {
+              return pane.getTitleAt(i);
+            }
+            return null;
+          }
+        };
+
+        add(label);
+        label.setBorder(BorderFactory.createEmptyBorder(0,0,0,5));
+        JButton button = new TabButton();
+        add(button);
+        setBorder(BorderFactory.createEmptyBorder(2,0,0,0));
+      }
+
+      private class TabButton extends JButton implements ActionListener {
+        public TabButton() {
+          int size = 17;
+          setPreferredSize(new Dimension(size, size));
+          setContentAreaFilled(false);
+          setFocusable(false);
+          setBorder(BorderFactory.createEtchedBorder());
+          setBorderPainted(false);
+          addMouseListener(buttonMouseListener);
+          setRolloverEnabled(true);
+          addActionListener(this);
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            int i = pane.indexOfTabComponent(ButtonTabComponent.this);
+            if (i != -1) {
+                pane.remove(i);
+            }
+        }
+
+        protected void paintComponent(Graphics g) {
+          super.paintComponent(g);
+          Graphics2D g2 = (Graphics2D) g.create();
+          if(getModel().isPressed()) {
+            g2. translate(1,1);
+          }
+          g2.setStroke(new BasicStroke(2));
+          g2.setColor(Color.BLACK);
+          if(getModel().isRollover()) {
+            g2.setColor(Color.RED);
+          }
+          int delta = 6;
+          g2.drawLine(delta, delta, getWidth()-delta-1, getHeight()-delta-1);
+          g2.drawLine(getWidth()-delta-1,delta,delta,getHeight()-delta-1);
+          g2.dispose();
+        }
+      }
+
+      private final MouseListener buttonMouseListener = new MouseAdapter() {
+        public void mouseEntered(MouseEvent e) {
+          Component component = e.getComponent();
+          if (component instanceof AbstractButton) {
+            AbstractButton button = (AbstractButton) component;
+            button.setBorderPainted(true);
+          }
+        }
+
+        public void mouseExited(MouseEvent e) {
+           Component component = e.getComponent();
+           if (component instanceof AbstractButton) {
+               AbstractButton button = (AbstractButton) component;
+               button.setBorderPainted(false);
+           }
+        }
+
+      };
+    }
+
+    private class UserListLabel extends JLabel implements ListCellRenderer<String> {
+
+      private final String icon = "img/user_icon.png";
+
+      public UserListLabel() {
+        this.setOpaque(true);
+      }
+
+      @Override
+      public Component getListCellRendererComponent(JList<? extends String> list, String pseudo, int index, boolean selected, boolean expanded) {
+
+         this.setIcon(new ImageIcon(getClass().getResource(this.icon)));
+         this.setText(pseudo);
+         if (selected) {
+           this.setBackground(list.getSelectionBackground());
+           this.setForeground(list.getSelectionForeground());
+         } else {
+           this.setBackground(list.getBackground());
+           this.setForeground(list.getForeground());
+         }
+
+         return this;
+       }
+    }
+
+    private class UserTabPane extends JPanel {
+      private final JTabbedPane containerPane;
+      private final MainController controler;
+      private InetAddress user_ip;
+
+      private JScrollPane scrollPane;
+      private JPanel historyPane = new JPanel();
+      private ArrayList<MessageHistory> history;
+
+      private JPanel msgPane = new JPanel();
+      private JButton send_button = new JButton("Envoyer");
+      private JTextField msg_to_send = new JTextField();
+
+      public UserTabPane(final JTabbedPane containerPane, final MainController controler, InetAddress user_ip) {
+        super(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        this.containerPane = containerPane;
+        this.controler = controler;
+        this.user_ip = user_ip;
+        this.setLayout(new BorderLayout());
+
+        this.updateHistory();
+        historyPane.setLayout(new BoxLayout(historyPane, BoxLayout.PAGE_AXIS));
+        for(int i=0; i<history.size(); i++) {
+            historyPane.add(history.get(i));
+            historyPane.add(Box.createRigidArea(new Dimension(0,5)));
+        }
+        historyPane.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+
+        scrollPane = new JScrollPane(historyPane);
+        historyPane.setAutoscrolls(true);
+        scrollPane.setPreferredSize(new Dimension(700,415));
+        scrollPane.setLayout(new ScrollPaneLayout());
+        scrollPane.getVerticalScrollBar().setUnitIncrement(10);
+
+        // Déplacer la scrollbar à la fin de la discussion
+        SwingUtilities.invokeLater(() -> {
+            JScrollBar bar = scrollPane.getVerticalScrollBar();
+            bar.setValue(bar.getMaximum());
+        });
+
+        this.add(scrollPane, BorderLayout.PAGE_START);
+        this.add(msgPane, BorderLayout.PAGE_END);
+
+        msgPane.setLayout(new BoxLayout(msgPane, BoxLayout.LINE_AXIS));
+        msgPane.add(msg_to_send);
+        msgPane.add(Box.createRigidArea(new Dimension(10,0)));
+        msgPane.add(send_button);
+        msgPane.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+
+        send_button.addActionListener(new ActionListener () {
+          public void actionPerformed(ActionEvent e) {
+            processMsg();
+          }
+        });
+
+        msg_to_send.addKeyListener(new CustomKeyListener());
+      }
+
+      private class CustomKeyListener implements KeyListener{
+          public void keyTyped(KeyEvent e) {
+          }
+          public void keyPressed(KeyEvent e) {
+             if(e.getKeyCode() == KeyEvent.VK_ENTER){
+               processMsg();
+             }
+          }
+          public void keyReleased(KeyEvent e) {
+          }
+      }
+
+      public void processMsg() {
+        String msg = msg_to_send.getText();
+        if(!msg.equals("")) {
+          msg_to_send.setText("");
+          String dest_pseudo = containerPane.getTitleAt(containerPane.getSelectedIndex());
+          controler.sendMessage(msg.getBytes(),dest_pseudo);
+        }
+        else {
+          Object[] options = {"Envoyer quand même", "Annuler"};
+          int choice = JOptionPane.showOptionDialog(null, "Vous êtes sur le point d'envoyer un message vide !", "Attention message vide !",
+                                              JOptionPane.YES_NO_OPTION,
+                                              JOptionPane.QUESTION_MESSAGE,
+                                              null,
+                                              options,
+                                              options[1]);
+          if(choice==0) {
+            String dest_pseudo = containerPane.getTitleAt(containerPane.getSelectedIndex());
+            controler.sendMessage(msg.getBytes(),dest_pseudo);
+          }
+        }
+      }
+
+      public void updateHistory() {
+        history = new ArrayList<MessageHistory>();
+        Log log = controler.getModel().getMsgHistory(user_ip);
+        ArrayList<Message> msg_list = log.getHistory();
+        for(int i=0; i<msg_list.size(); i++) {
+          MessageHistory new_msg = new MessageHistory(msg_list.get(i), controler);
+          history.add(new_msg);
+        }
+      }
+
+      public InetAddress getUserIp() {
+        return this.user_ip;
+      }
+
+      private class MessageHistory extends JPanel {
+
+        private final MainController controler;
+
+        private String source;
+        private String dest;
+        private byte[] data;
+        private String timestamp;
+
+        private JTextArea message_content;
+        private JLabel time_info;
+
+        public MessageHistory(Message msg, MainController controler) {
+          super(new FlowLayout(FlowLayout.LEFT, 0, 0));
+          this.controler = controler;
+
+          // Récupération des informations du message
+          boolean from_me;
+          InetAddress source_address = msg.getSource();
+          InetAddress dest_address = msg.getDest();
+          if(source_address.equals(this.controler.getModel().getLocalUser().getIp())) {
+            this.source = this.controler.getModel().getLocalUser().getPseudo();
+            this.dest = this.controler.getModel().getPseudoFromIP(dest_address);
+            from_me = true;
+          }
+          else {
+            this.dest = this.controler.getModel().getLocalUser().getPseudo();
+            this.source = this.controler.getModel().getPseudoFromIP(source_address);
+            from_me = false;
+          }
+
+          this.data = msg.getData();
+          this.timestamp = msg.getTimestamp();
+
+          // Création des éléments du Panel
+          String info = "De "+ this.source +" à "+ this.dest;
+          time_info = new JLabel(this.timestamp, SwingConstants.RIGHT);
+          time_info.setBorder(BorderFactory.createEmptyBorder(0,0,3,3));
+          Font font = new Font("Courier", Font.ITALIC, 12);
+          time_info.setFont(font);
+          String data_str = new String(this.data);
+          message_content = new JTextArea(data_str);
+          message_content.setLineWrap(true);
+          message_content.setWrapStyleWord(true);
+          message_content.setEditable(false);
+          message_content.setBackground(new Color(0,0,0,0));
+          message_content.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+
+          this.setLayout(new BorderLayout());
+
+          this.add(message_content, BorderLayout.CENTER);
+          if(from_me) {
+            Border redLine = BorderFactory.createLineBorder(Color.red, 2);
+            this.setBorder(BorderFactory.createTitledBorder(redLine, info));
+          }
+          else {
+            Border blueLine = BorderFactory.createLineBorder(Color.blue, 2);
+            this.setBorder(BorderFactory.createTitledBorder(blueLine, info));
+          }
+
+          //this.add(Box.createRigidArea(new Dimension(0,5)));
+          this.add(time_info, BorderLayout.PAGE_END);
+
+          this.setMaximumSize(new Dimension(700,100));;
+        }
+
+      }
+
     }
 }
