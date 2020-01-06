@@ -11,30 +11,30 @@ public class Main {
 
   public static void main(String[] args) {
 
-	int sendPort = 5000;
-	int receivePort = 6000;
+    	int sendPort = 5000;
+    	int receivePort = 6000;
 
-    //Récupération de notre IP sur le réseau local
-    InetAddress my_address = null;
-    try {
-        DatagramSocket sock = new DatagramSocket(8888);
-        sock.connect(new InetSocketAddress("8.8.8.8", 8888));
-        my_address = sock.getLocalAddress();
-        sock.disconnect();
-    } catch (Exception e) {
-        System.err.println(e.getClass().getName()+":"+e.getMessage());
-    }
+        //Récupération de notre IP sur le réseau local
+        InetAddress my_address = null;
+        try {
+            DatagramSocket sock = new DatagramSocket(8888);
+            sock.connect(new InetSocketAddress("8.8.8.8", 8888));
+            my_address = sock.getLocalAddress();
+            sock.disconnect();
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName()+":"+e.getMessage());
+        }
 
-    //Instanciation de notre modèle
-    BddManager model = new BddManager(my_address);
+        //Instanciation de notre modèle
+        BddManager model = new BddManager(my_address);
 
-    //Création du contrôleur
-    MainController controler = new MainController(model,sendPort,receivePort);
+        //Création du contrôleur
+        MainController controler = new MainController(model,sendPort,receivePort);
 
-    //Création de notre fenêtre de login avec le contrôleur en paramètre
-    initLookAndFeel();
-    JFrame.setDefaultLookAndFeelDecorated(true);
-    LoginWindow view = new LoginWindow(controler,false);
+        //Création de notre fenêtre de login avec le contrôleur en paramètre
+        initLookAndFeel();
+        JFrame.setDefaultLookAndFeelDecorated(true);
+        LoginWindow view = new LoginWindow(controler,false);
   }
 
   private static void initLookAndFeel() {
