@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
 
-public class SendManager implements Runnable{
+public class SendManager /*implements Runnable*/{
 
     private DatagramSocket sock;
 
@@ -28,7 +28,7 @@ public class SendManager implements Runnable{
         }
     }
 
-    public void run() {
+    /*public void run() {
         System.out.println("Lancement du thread d'envoi");
         Message msg = null;
         MessageSys sys1 = null;
@@ -57,9 +57,9 @@ public class SendManager implements Runnable{
             System.err.println(e.getClass().getName()+":"+e.getMessage());
             System.exit(0);
         }
-    }
+    }*/
 
-    private void UDPserializeSend (Object obj, InetAddress distant) {
+    public void UDPserializeSend (Object obj, InetAddress distant) {
     	ByteArrayOutputStream outByte = null;
     	try{
 			outByte = new ByteArrayOutputStream();
@@ -67,7 +67,7 @@ public class SendManager implements Runnable{
             ObjectOutputStream objOut = new ObjectOutputStream(outByte);
         	objOut.writeObject(obj); //envoi de l'objet serializé
         	objectSerialized = outByte.toByteArray();
-        	DatagramPacket objPacket = new DatagramPacket(objectSerialized, objectSerialized.length, distant, this.port);
+        	DatagramPacket objPacket = new DatagramPacket(objectSerialized, objectSerialized.length, distant, 6000);
             try{
             	sock.send(objPacket);
             	System.out.println("Envoi d'un objet serializé");

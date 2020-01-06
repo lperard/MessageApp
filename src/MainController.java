@@ -10,6 +10,13 @@ public class MainController {
   public MainController(BddManager model, int sendPort, int receivePort) {
     this.model = model;
     this.com = new SocketManager(this.model, sendPort, receivePort);
+    MessageSys sys = new MessageSys(Type.Hello, this.model.getLocalUser());
+    try {
+    	this.com.getSendManager().sendBroadcast(sys);
+    } catch (Exception e) {
+    	System.out.println("Unknown Host Address !\n");
+        System.exit(0);
+    }
   }
 
   public BddManager getModel() {
@@ -20,18 +27,36 @@ public class MainController {
     User local_user = model.getLocalUser();
     User new_user = new User(local_user.getIp(),pseudo);
     model.setLocalUser(new_user);
-    // PUIS SEND HELLO BROADCAST !
+    MessageSys sys = new MessageSys(Type.Connected, this.model.getLocalUser());
+    try {
+    	this.com.getSendManager().sendBroadcast(sys);
+    } catch (Exception e) {
+    	System.out.println("Unknown Host Address !\n");
+        System.exit(0);
+    }
   }
 
   public void updatePseudo(String pseudo) {
     User local_user = model.getLocalUser();
     User new_user = new User(local_user.getIp(),pseudo);
     model.setLocalUser(new_user);
-    // PUIS SEND CHANGEPSEUDO BROADCAST !
+    MessageSys sys = new MessageSys(Type.ChangePseudo, this.model.getLocalUser());
+    try {
+    	this.com.getSendManager().sendBroadcast(sys);
+    } catch (Exception e) {
+    	System.out.println("Unknown Host Address !\n");
+        System.exit(0);
+    }
   }
 
   public void disconnect() {
-    // SEND GOODBYE BROADCAST !
+  MessageSys sys = new MessageSys(Type.Goodbye, this.model.getLocalUser());
+    try {
+    	this.com.getSendManager().sendBroadcast(sys);
+    } catch (Exception e) {
+    	System.out.println("Unknown Host Address !\n");
+        System.exit(0);
+    }
     System.exit(0);
   }
 
@@ -45,7 +70,8 @@ public class MainController {
 
     if(ip_dest!=null) {
       model.addMessage(ip_source, ip_dest, data, timestamp);
-      // PUIS SEND LE MESSAGE VIA SOCKET !
+      Message msg = new Message(ip_source, ip_dest, data, timestamp);
+      com.getSendManager().UDPserializeSend(msg, ip_dest);
     }
     else {
       System.out.println("Il semblerait que le destinataire n'est pas connecté !");

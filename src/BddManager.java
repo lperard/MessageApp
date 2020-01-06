@@ -12,7 +12,7 @@ public class BddManager implements Observable {
     protected User local_user;
     protected ArrayList<Observer> listObserver;
 
-    public BddManager() {
+    public BddManager(InetAddress address) {
 
         this.bdd_connection = null;
         this.bdd_statement = null;
@@ -21,28 +21,11 @@ public class BddManager implements Observable {
         this.connected_users = new ArrayList<User>();
 
         try {
-            InetAddress my_address = InetAddress.getLocalHost();
-            this.local_user = new User(my_address,"");
+            this.local_user = new User(address,"");
 
             // POUR LES TESTS A ENLEVER !
-            this.connected_users.add(new User(InetAddress.getByName("190.168.120.1"),"Jean"));
-            this.connected_users.add(new User(InetAddress.getByName("190.168.120.2"),"Pierre"));
-            this.connected_users.add(new User(InetAddress.getByName("190.168.120.3"), "Matthieu"));
-            this.connected_users.add(new User(InetAddress.getByName("190.168.120.4"), "Paul"));
-            this.connected_users.add(new User(InetAddress.getByName("190.168.120.5"), "Philippe"));
             this.connected_users.add(new User(InetAddress.getByName("190.168.120.6"), "Claude"));
-            this.connected_users.add(new User(InetAddress.getByName("190.168.120.7"), "Marie"));
-            this.connected_users.add(new User(InetAddress.getByName("190.168.120.8"), "Lucie"));
-            this.connected_users.add(new User(InetAddress.getByName("190.168.120.9"), "Claire"));
-            this.connected_users.add(new User(InetAddress.getByName("190.168.120.10"), "Julie"));
             this.connected_users.add(new User(InetAddress.getByName("190.168.120.11"), "Alain"));
-            this.connected_users.add(new User(InetAddress.getByName("190.168.120.12"), "Adrien"));
-            this.connected_users.add(new User(InetAddress.getByName("190.168.120.13"), "Lucas"));
-            this.connected_users.add(new User(InetAddress.getByName("190.168.120.14"), "Rafael"));
-            this.connected_users.add(new User(InetAddress.getByName("190.168.120.15"), "Ben"));
-            this.connected_users.add(new User(InetAddress.getByName("190.168.120.16"), "Grégoire"));
-            this.connected_users.add(new User(InetAddress.getByName("190.168.120.17"), "Charles"));
-            this.connected_users.add(new User(InetAddress.getByName("190.168.120.18"), "Emilie"));
 
         }
         catch (UnknownHostException e) {

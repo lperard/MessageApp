@@ -1,5 +1,6 @@
 public enum Type {
     Hello("HELLO"),
+    Connected("CNNTD"),
     Goodbye("GDBYE"),
     ChangePseudo("CHPSD");
 
