@@ -60,7 +60,7 @@ public class MessageHistory extends JPanel {
     }
     else {
       Border blueLine = BorderFactory.createLineBorder(Color.blue, 2);
-      this.setBorder(BorderFactory.createTitledBorder(info));
+      this.setBorder(BorderFactory.createTitledBorder(blueLine, info));
     }
 
     //this.add(Box.createRigidArea(new Dimension(0,5)));
