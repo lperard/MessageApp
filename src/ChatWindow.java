@@ -1,10 +1,5 @@
-package View;
-
-import Controller.MainController;
-import Controller.Message;
-import Model.User;
-import Model.Log;
-
+import java.io.*;
+import javax.swing.filechooser.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
@@ -29,6 +24,8 @@ public class ChatWindow extends JFrame implements Observer {
     private JList<String> user_list = null;
 
     private JTabbedPane history = new JTabbedPane();
+
+    private File file = null;
 
     public ChatWindow(MainController controler, String current_pseudo) {
         this.controler = controler;
@@ -153,12 +150,21 @@ public class ChatWindow extends JFrame implements Observer {
         tmp = tmp.replace("_",".");
         try {
           InetAddress tmp_address = InetAddress.getByName(tmp);
+          int tab_already_exists = 0;
           for(int i=0; i<history.getTabCount(); i++) {
             UserTabPane tab = (UserTabPane) history.getComponentAt(i);
             if(tab.getUserIp().getHostAddress().equals(tmp)) {
               UserTabPane new_tab = new UserTabPane(history, controler, tmp_address);
               history.setComponentAt(i,new_tab);
+              tab_already_exists = 1;
             }
+          }
+          if(tab_already_exists == 0) {
+            UserTabPane tab = new UserTabPane(history, controler, tmp_address);
+            String pseudo = controler.getModel().getPseudoFromIP(tmp_address);
+            history.addTab(pseudo,tab);
+            history.setTabComponentAt(history.getTabCount()-1,new ButtonTabComponent(history));
+            history.setSelectedIndex(history.getTabCount()-1);
           }
         }
         catch (Exception e) {
@@ -256,7 +262,7 @@ public class ChatWindow extends JFrame implements Observer {
 
     private class UserListLabel extends JLabel implements ListCellRenderer<String> {
 
-      private final String icon = "../../img/user_icon.png";
+      private final String icon = "../img/user_icon.png";
 
       public UserListLabel() {
         this.setOpaque(true);
@@ -291,6 +297,8 @@ public class ChatWindow extends JFrame implements Observer {
       private JPanel msgPane = new JPanel();
       private JButton send_button = new JButton("Envoyer");
       private JTextField msg_to_send = new JTextField();
+      private JFileChooser file_chooser = new JFileChooser();
+      private JButton open_button = new JButton("Importer");
 
       public UserTabPane(final JTabbedPane containerPane, final MainController controler, InetAddress user_ip) {
         super(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -324,13 +332,21 @@ public class ChatWindow extends JFrame implements Observer {
 
         msgPane.setLayout(new BoxLayout(msgPane, BoxLayout.LINE_AXIS));
         msgPane.add(msg_to_send);
-        msgPane.add(Box.createRigidArea(new Dimension(10,0)));
+        msgPane.add(Box.createRigidArea(new Dimension(5,0)));
         msgPane.add(send_button);
         msgPane.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        msgPane.add(Box.createRigidArea(new Dimension(5,0)));
+        msgPane.add(open_button);
 
         send_button.addActionListener(new ActionListener () {
           public void actionPerformed(ActionEvent e) {
             processMsg();
+          }
+        });
+
+        open_button.addActionListener(new ActionListener () {
+          public void actionPerformed(ActionEvent e) {
+            processFile();
           }
         });
 
@@ -368,6 +384,18 @@ public class ChatWindow extends JFrame implements Observer {
             String dest_pseudo = containerPane.getTitleAt(containerPane.getSelectedIndex());
             controler.sendMessage(msg.getBytes(),dest_pseudo);
           }
+        }
+      }
+
+      public void processFile() {
+        int returnVal = file_chooser.showOpenDialog(file_chooser);
+ 
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            file = file_chooser.getSelectedFile();
+            System.out.println("Hashcode :" + file.hashCode());
+            String dest_pseudo = containerPane.getTitleAt(containerPane.getSelectedIndex());
+            InetAddress dest_address = controler.getModel().getIpFromPseudo(dest_pseudo);
+            controler.getSocketManager().getSendManager().UDPserializeSend(file, dest_address);
         }
       }
 

@@ -1,7 +1,3 @@
-package Model;
-
-import View.Observer;
-
 public interface Observable {
 
     public void addObserver(Observer obs);

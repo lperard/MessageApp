@@ -1,8 +1,5 @@
-package Controller;
-
-import Model.User;
-
 import java.io.Serializable;
+
 public class MessageSys implements Serializable {
 
 	private static final long serialVersionUID = 3333L;

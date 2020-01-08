@@ -1,8 +1,3 @@
-package Controller;
-
-import Model.BddManager;
-import Model.User;
-
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
 import java.net.*;
@@ -81,6 +76,10 @@ public class MainController {
     else {
       System.out.println("Il semblerait que le destinataire n'est pas connecté !");
     }
+  }
+
+  public SocketManager getSocketManager() {
+    return this.com;
   }
 
 }

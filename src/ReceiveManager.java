@@ -1,8 +1,3 @@
-package Controller;
-
-import Model.BddManager;
-import Model.User;
-
 import java.net.*;
 import java.net.DatagramSocket;
 import java.io.*;
@@ -39,8 +34,10 @@ public class ReceiveManager implements Runnable{
             User user = msys.getUser();
             if(type.equals(Type.Hello)) {
                 System.out.println("J'ai reçu un Hello !");
-                MessageSys sys = new MessageSys(Type.Connected, this.model.getLocalUser());
-                this.sendM.UDPserializeSend(sys, user.getIp());
+                if(!this.model.getLocalUser().getPseudo().equals("")) {
+                    MessageSys sys = new MessageSys(Type.Connected, this.model.getLocalUser());
+                    this.sendM.UDPserializeSend(sys, user.getIp());
+                }
             }
             else if(type.equals(Type.Connected)) {
             	System.out.println("J'ai reçu un Connected !");
@@ -80,15 +77,20 @@ public class ReceiveManager implements Runnable{
                 try {
                 	ObjectInput inObj = new ObjectInputStream(inStream);
                 	Object o = inObj.readObject();
-                  System.out.println("Reception d'un objet serializé");
+                    System.out.println("Reception d'un objet serializé");
                 	if (o.getClass().toString().compareTo("class MessageSys") == 0) {
                   		MessageSys message_sys_received = (MessageSys) o;
                   		processReceivedDataSys(message_sys_received);
                 	}
                 	else if (o.getClass().toString().compareTo("class Message") == 0){
-                		  Message message_received = (Message) o;
+                		Message message_received = (Message) o;
                     	processReceivedDataMsg(message_received);
                 	}
+                    else if (o.getClass().toString().compareTo("class java.io.File") == 0) {
+                        System.out.println("J'ai reçu un fichier !");
+                        File file = (File) o;
+                        System.out.println("Hashcode: " + file.hashCode());
+                    }
                 	else {
                 		System.out.println("Serialization inconnue !");
                 	}

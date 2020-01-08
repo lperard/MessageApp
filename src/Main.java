@@ -1,13 +1,9 @@
-import View.*;
-import Model.*;
-import Controller.*;
-
 import javax.swing.*;
 import java.net.*;
 
 public class Main {
 
-  private static String LOOKANDFEEL = "Metal";
+  private static String LOOKANDFEEL = "GTK+";
 
   public static void main(String[] args) {
 

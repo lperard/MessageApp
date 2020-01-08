@@ -1,8 +1,3 @@
-package Model;
-
-import Controller.Message;
-import View.Observer;
-
 import java.util.ArrayList;
 import java.net.*;
 import java.sql.*;
@@ -25,18 +20,7 @@ public class BddManager implements Observable {
 
         this.connected_users = new ArrayList<User>();
 
-        try {
-            this.local_user = new User(address,"");
-
-            // POUR LES TESTS A ENLEVER !
-            this.connected_users.add(new User(InetAddress.getByName("190.168.120.6"), "Claude"));
-            this.connected_users.add(new User(InetAddress.getByName("190.168.120.11"), "Alain"));
-
-        }
-        catch (UnknownHostException e) {
-            System.out.println("Unknown Host Address !\n");
-            System.exit(0);
-        }
+        this.local_user = new User(address,"");
         this.listObserver = new ArrayList<Observer>();
     }
 
@@ -129,8 +113,8 @@ public class BddManager implements Observable {
 
                 sql = "insert into LOG_" + dest_reformatted +" (source, dest, data, timestamp) values (?,?,?,?);";
                 this.bdd_preparedstatement = this.bdd_connection.prepareStatement(sql);
-                this.bdd_preparedstatement.setString(1,source_address);
-                this.bdd_preparedstatement.setString(2,dest_address);
+                this.bdd_preparedstatement.setString(1, source_address);
+                this.bdd_preparedstatement.setString(2, dest_address);
                 this.bdd_preparedstatement.setString(3, data_str);
                 this.bdd_preparedstatement.setString(4, timestamp);
                 this.bdd_preparedstatement.executeUpdate();
@@ -141,8 +125,13 @@ public class BddManager implements Observable {
                 sql = "create table if not exists LOG_"+ source_reformatted +" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(100), timestamp VARCHAR(20))";
                 this.bdd_statement.executeUpdate(sql);
 
-                sql = "insert into LOG_"+ source_reformatted +" (source,dest,data,timestamp) values ('"+ source_address +"', '"+ dest_address +"', '"+data_str+"', '"+timestamp+"');";
-                this.bdd_statement.executeUpdate(sql);
+                sql = "insert into LOG_" + source_reformatted +" (source, dest, data, timestamp) values (?,?,?,?);";
+                this.bdd_preparedstatement = this.bdd_connection.prepareStatement(sql);
+                this.bdd_preparedstatement.setString(1, source_address);
+                this.bdd_preparedstatement.setString(2, dest_address);
+                this.bdd_preparedstatement.setString(3, data_str);
+                this.bdd_preparedstatement.setString(4, timestamp);
+                this.bdd_preparedstatement.executeUpdate();
 
                 notifyObserver("new_message_from_"+ source_reformatted);
             }

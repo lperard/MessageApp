@@ -1,5 +1,3 @@
-package Model;
-
 import java.net.*;
 import java.io.Serializable;
 public class User implements Serializable {
