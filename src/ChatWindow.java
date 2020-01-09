@@ -1,4 +1,6 @@
 import java.io.*;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
 import javax.swing.filechooser.*;
 import javax.swing.*;
 import javax.swing.border.*;
@@ -394,13 +396,17 @@ public class ChatWindow extends JFrame implements Observer {
 
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             file = file_chooser.getSelectedFile();
+            String path = file.getAbsolutePath();
             try {
-              byte[] data = "hello".getBytes(); // POUR L INSTANT
-              System.out.println("Hashcode :" + file.hashCode());
-              String dest_pseudo = containerPane.getTitleAt(containerPane.getSelectedIndex());
-              controler.sendMessage(data,dest_pseudo,"img");
+                BufferedImage bImage = ImageIO.read(new File(path));
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                ImageIO.write(bImage, "jpg", bos);
+                byte[] data = bos.toByteArray();
+                System.out.println("Hashcode :" + file.hashCode());
+                String dest_pseudo = containerPane.getTitleAt(containerPane.getSelectedIndex());
+                controler.sendMessage(data,dest_pseudo,"img");
             } catch (Exception e) {
-              System.err.println(e.getClass().getName()+":"+e.getMessage());
+                System.err.println(e.getClass().getName()+":"+e.getMessage());
             }
         }
       }
@@ -429,7 +435,6 @@ public class ChatWindow extends JFrame implements Observer {
         private String timestamp;
         private String filetype;
 
-        private JPanel image;
         private JTextArea message_content;
         private JLabel time_info;
 
@@ -476,7 +481,9 @@ public class ChatWindow extends JFrame implements Observer {
             this.add(message_content, BorderLayout.CENTER);
           }
           else if(this.filetype.equals("img")) {
+            // Si on est l'expéditeur on affiche uniquement le fait qu'on a envoyé une image et le path pour accéder à ce fichier
 
+            // Si on est le destinataire on affiche un boutton qui permet de download l'image
           }
           else if(this.filetype.equals("file")) {
 
