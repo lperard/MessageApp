@@ -60,7 +60,7 @@ public class MainController {
     System.exit(0);
   }
 
-  public void sendMessage(byte[] data, String dest_pseudo, String filetype) {
+  public void sendMessage(byte[] data, String dest_pseudo) {
     InetAddress ip_source = model.getLocalUser().getIp();
     InetAddress ip_dest = model.getIpFromPseudo(dest_pseudo);
 
@@ -69,8 +69,26 @@ public class MainController {
     String timestamp = new String(dtf.format(now));
 
     if(ip_dest!=null) {
-      model.addMessage(ip_source, ip_dest, data, timestamp, filetype);
-      Message msg = new Message(ip_source, ip_dest, data, timestamp, filetype);
+      model.addMessage(ip_source, ip_dest, data, timestamp, "text");
+      Message msg = new Message(ip_source, ip_dest, data, timestamp, "text");
+      com.getSendManager().UDPserializeSend(msg, ip_dest);
+    }
+    else {
+      System.out.println("Il semblerait que le destinataire n'est pas connecté !");
+    }
+  }
+
+  public void sendImage(String path, byte[] data, String dest_pseudo) {
+    InetAddress ip_source = model.getLocalUser().getIp();
+    InetAddress ip_dest = model.getIpFromPseudo(dest_pseudo);
+
+    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+    LocalDateTime now = LocalDateTime.now();
+    String timestamp = new String(dtf.format(now));
+
+    if(ip_dest!=null) {
+      model.addMessage(ip_source, ip_dest, path.getBytes(), timestamp, "img");
+      Message msg = new Message(ip_source, ip_dest, data, timestamp, "img", path);
       com.getSendManager().UDPserializeSend(msg, ip_dest);
     }
     else {

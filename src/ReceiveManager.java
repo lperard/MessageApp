@@ -27,7 +27,25 @@ public class ReceiveManager implements Runnable{
             byte[] data = msg.getData();
             String timestamp = msg.getTimestamp();
             String filetype = msg.getFiletype();
-            this.model.addMessage(source,dest,data,timestamp,filetype);
+            if(filetype.equals("text"))
+              this.model.addMessage(source,dest,data,timestamp,filetype);
+            else {
+              // On sauvegarde l'image dans nos fichiers
+              String path = msg.getFilepath();
+              int index = path.lastIndexOf("/");
+              if(index == -1) {
+                index = path.lastIndexOf("\\");
+              }
+              String filename = path.substring(index + 1);
+              File file = new File(filename);
+              try {
+                file.createNewFile();
+              } catch (Exception e) {
+                e.printStackTrace();
+              }
+              // On ajoute à la bdd un message avec le path du fichier
+              this.model.addMessage(source,dest,file.getAbsolutePath().getBytes(),timestamp,filetype);
+            }
         }
 
         public void processReceivedDataSys(MessageSys msys) {

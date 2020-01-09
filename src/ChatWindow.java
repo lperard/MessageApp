@@ -160,6 +160,8 @@ public class ChatWindow extends JFrame implements Observer {
             if(tab.getUserIp().getHostAddress().equals(tmp)) {
               UserTabPane new_tab = new UserTabPane(history, controler, tmp_address);
               history.setComponentAt(i,new_tab);
+              history.setBackgroundAt(i,Color.RED);
+              history.setForegroundAt(i,Color.WHITE);
               tab_already_exists = 1;
             }
           }
@@ -168,7 +170,8 @@ public class ChatWindow extends JFrame implements Observer {
             String pseudo = controler.getModel().getPseudoFromIP(tmp_address);
             history.addTab(pseudo,tab);
             history.setTabComponentAt(history.getTabCount()-1,new ButtonTabComponent(history));
-            history.setSelectedIndex(history.getTabCount()-1);
+            history.setBackgroundAt(history.getTabCount()-1,Color.RED);
+            history.setForegroundAt(history.getTabCount()-1,Color.WHITE);
           }
         }
         catch (Exception e) {
@@ -204,6 +207,18 @@ public class ChatWindow extends JFrame implements Observer {
         JButton button = new TabButton();
         add(button);
         setBorder(BorderFactory.createEmptyBorder(2,0,0,0));
+
+        this.addMouseListener(new MouseAdapter() {
+          public void mouseClicked(MouseEvent e) {
+            int index = pane.indexOfTabComponent(ButtonTabComponent.this);
+            if (pane.getBackgroundAt(index).equals(Color.RED)){
+              pane.setBackgroundAt(index, new Color(27,29,36));
+              pane.setForegroundAt(index, Color.BLACK);
+            }
+            pane.setSelectedIndex(index);
+            System.out.println(pane.getBackgroundAt(index));
+          }
+        });
       }
 
       private class TabButton extends JButton implements ActionListener {
@@ -374,7 +389,7 @@ public class ChatWindow extends JFrame implements Observer {
         if(!msg.equals("")) {
           msg_to_send.setText("");
           String dest_pseudo = containerPane.getTitleAt(containerPane.getSelectedIndex());
-          controler.sendMessage(msg.getBytes(),dest_pseudo,"text");
+          controler.sendMessage(msg.getBytes(),dest_pseudo);
         }
         else {
           Object[] options = {"Envoyer quand même", "Annuler"};
@@ -386,7 +401,7 @@ public class ChatWindow extends JFrame implements Observer {
                                               options[1]);
           if(choice==0) {
             String dest_pseudo = containerPane.getTitleAt(containerPane.getSelectedIndex());
-            controler.sendMessage(msg.getBytes(),dest_pseudo,"text");
+            controler.sendMessage(msg.getBytes(),dest_pseudo);
           }
         }
       }
@@ -404,7 +419,7 @@ public class ChatWindow extends JFrame implements Observer {
                 byte[] data = bos.toByteArray();
                 System.out.println("Hashcode :" + file.hashCode());
                 String dest_pseudo = containerPane.getTitleAt(containerPane.getSelectedIndex());
-                controler.sendMessage(data,dest_pseudo,"img");
+                controler.sendImage(path,data,dest_pseudo);
             } catch (Exception e) {
                 System.err.println(e.getClass().getName()+":"+e.getMessage());
             }
@@ -470,20 +485,23 @@ public class ChatWindow extends JFrame implements Observer {
 
           this.setLayout(new BorderLayout());
 
+          String data_str = new String(this.data);
+
           if(this.filetype.equals("text")) {
-            String data_str = new String(this.data);
             message_content = new JTextArea(data_str);
-            message_content.setLineWrap(true);
-            message_content.setWrapStyleWord(true);
-            message_content.setEditable(false);
-            message_content.setBackground(new Color(0,0,0,0));
-            message_content.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-            this.add(message_content, BorderLayout.CENTER);
           }
           else if(this.filetype.equals("img")) {
-            // Si on est l'expéditeur on affiche uniquement le fait qu'on a envoyé une image et le path pour accéder à ce fichier
+            // Si on est l'expéditeur on affiche le path de l'image envoyée
+            if(from_me) {
+              message_content = new JTextArea("Envoi de l'image " + data_str);
+            }
+            // Si on est le destinataire on affiche le path vers l'image reçue
+            else {
+              message_content = new JTextArea("Image reçue " + data_str);
+            }
 
-            // Si on est le destinataire on affiche un boutton qui permet de download l'image
+            Font font_img = new Font("Courier", Font.ITALIC, 14);
+            message_content.setFont(font_img);
           }
           else if(this.filetype.equals("file")) {
 
@@ -491,6 +509,13 @@ public class ChatWindow extends JFrame implements Observer {
           else {
             System.out.println("Unrecognized filetype !");
           }
+
+          message_content.setLineWrap(true);
+          message_content.setWrapStyleWord(true);
+          message_content.setEditable(false);
+          message_content.setBackground(new Color(0,0,0,0));
+          message_content.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+          this.add(message_content, BorderLayout.CENTER);
 
           // On met des bordures de couleur différente en fonction de la source du message
           if(from_me) {
