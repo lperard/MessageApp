@@ -60,7 +60,7 @@ public class MainController {
     System.exit(0);
   }
 
-  public void sendMessage(byte[] data, String dest_pseudo) {
+  public void sendMessage(byte[] data, String dest_pseudo, String filetype) {
     InetAddress ip_source = model.getLocalUser().getIp();
     InetAddress ip_dest = model.getIpFromPseudo(dest_pseudo);
 
@@ -69,8 +69,8 @@ public class MainController {
     String timestamp = new String(dtf.format(now));
 
     if(ip_dest!=null) {
-      model.addMessage(ip_source, ip_dest, data, timestamp);
-      Message msg = new Message(ip_source, ip_dest, data, timestamp);
+      model.addMessage(ip_source, ip_dest, data, timestamp, filetype);
+      Message msg = new Message(ip_source, ip_dest, data, timestamp, filetype);
       com.getSendManager().UDPserializeSend(msg, ip_dest);
     }
     else {

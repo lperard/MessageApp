@@ -61,22 +61,24 @@ public class ChatWindow extends JFrame implements Observer {
 
       user_list.addMouseListener(new MouseAdapter() {
         public void mouseClicked(MouseEvent e) {
-          String selectedItem = (String) user_list.getSelectedValue();
-          int tabExists = -1;
-          for(int i = 0; i<history.getTabCount(); i++) {
-            if(history.getTitleAt(i).equals(selectedItem)) {
-              tabExists = i;
+          if(user_list.getModel().getSize()!=0) {
+            String selectedItem = (String) user_list.getSelectedValue();
+            int tabExists = -1;
+            for(int i = 0; i<history.getTabCount(); i++) {
+              if(history.getTitleAt(i).equals(selectedItem)) {
+                tabExists = i;
+              }
             }
-          }
-          if(tabExists==-1) {
-            InetAddress tab_ip = controler.getModel().getIpFromPseudo(selectedItem);
-            UserTabPane historyPane = new UserTabPane(history,controler,tab_ip);
-            history.addTab(selectedItem,historyPane);
-            history.setTabComponentAt(history.getTabCount()-1,new ButtonTabComponent(history));
-            history.setSelectedIndex(history.getTabCount()-1);
-          }
-          else {
-            history.setSelectedIndex(tabExists);
+            if(tabExists==-1) {
+              InetAddress tab_ip = controler.getModel().getIpFromPseudo(selectedItem);
+              UserTabPane historyPane = new UserTabPane(history,controler,tab_ip);
+              history.addTab(selectedItem,historyPane);
+              history.setTabComponentAt(history.getTabCount()-1,new ButtonTabComponent(history));
+              history.setSelectedIndex(history.getTabCount()-1);
+            }
+            else {
+              history.setSelectedIndex(tabExists);
+            }
           }
         }
       });
@@ -370,7 +372,7 @@ public class ChatWindow extends JFrame implements Observer {
         if(!msg.equals("")) {
           msg_to_send.setText("");
           String dest_pseudo = containerPane.getTitleAt(containerPane.getSelectedIndex());
-          controler.sendMessage(msg.getBytes(),dest_pseudo);
+          controler.sendMessage(msg.getBytes(),dest_pseudo,"text");
         }
         else {
           Object[] options = {"Envoyer quand même", "Annuler"};
@@ -382,20 +384,24 @@ public class ChatWindow extends JFrame implements Observer {
                                               options[1]);
           if(choice==0) {
             String dest_pseudo = containerPane.getTitleAt(containerPane.getSelectedIndex());
-            controler.sendMessage(msg.getBytes(),dest_pseudo);
+            controler.sendMessage(msg.getBytes(),dest_pseudo,"text");
           }
         }
       }
 
       public void processFile() {
         int returnVal = file_chooser.showOpenDialog(file_chooser);
- 
+
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             file = file_chooser.getSelectedFile();
-            System.out.println("Hashcode :" + file.hashCode());
-            String dest_pseudo = containerPane.getTitleAt(containerPane.getSelectedIndex());
-            InetAddress dest_address = controler.getModel().getIpFromPseudo(dest_pseudo);
-            controler.getSocketManager().getSendManager().UDPserializeSend(file, dest_address);
+            try {
+              byte[] data = "hello".getBytes(); // POUR L INSTANT
+              System.out.println("Hashcode :" + file.hashCode());
+              String dest_pseudo = containerPane.getTitleAt(containerPane.getSelectedIndex());
+              controler.sendMessage(data,dest_pseudo,"img");
+            } catch (Exception e) {
+              System.err.println(e.getClass().getName()+":"+e.getMessage());
+            }
         }
       }
 
@@ -421,7 +427,9 @@ public class ChatWindow extends JFrame implements Observer {
         private String dest;
         private byte[] data;
         private String timestamp;
+        private String filetype;
 
+        private JPanel image;
         private JTextArea message_content;
         private JLabel time_info;
 
@@ -446,6 +454,7 @@ public class ChatWindow extends JFrame implements Observer {
 
           this.data = msg.getData();
           this.timestamp = msg.getTimestamp();
+          this.filetype = msg.getFiletype();
 
           // Création des éléments du Panel
           String info = "De "+ this.source +" à "+ this.dest;
@@ -453,17 +462,30 @@ public class ChatWindow extends JFrame implements Observer {
           time_info.setBorder(BorderFactory.createEmptyBorder(0,0,3,3));
           Font font = new Font("Courier", Font.ITALIC, 12);
           time_info.setFont(font);
-          String data_str = new String(this.data);
-          message_content = new JTextArea(data_str);
-          message_content.setLineWrap(true);
-          message_content.setWrapStyleWord(true);
-          message_content.setEditable(false);
-          message_content.setBackground(new Color(0,0,0,0));
-          message_content.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
           this.setLayout(new BorderLayout());
 
-          this.add(message_content, BorderLayout.CENTER);
+          if(this.filetype.equals("text")) {
+            String data_str = new String(this.data);
+            message_content = new JTextArea(data_str);
+            message_content.setLineWrap(true);
+            message_content.setWrapStyleWord(true);
+            message_content.setEditable(false);
+            message_content.setBackground(new Color(0,0,0,0));
+            message_content.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+            this.add(message_content, BorderLayout.CENTER);
+          }
+          else if(this.filetype.equals("img")) {
+
+          }
+          else if(this.filetype.equals("file")) {
+
+          }
+          else {
+            System.out.println("Unrecognized filetype !");
+          }
+
+          // On met des bordures de couleur différente en fonction de la source du message
           if(from_me) {
             Border redLine = BorderFactory.createLineBorder(Color.red, 2);
             this.setBorder(BorderFactory.createTitledBorder(redLine, info));

@@ -20,7 +20,18 @@ public class BddManager implements Observable {
 
         this.connected_users = new ArrayList<User>();
 
-        this.local_user = new User(address,"");
+        try {
+            this.local_user = new User(address,"");
+
+            // POUR LES TESTS A ENLEVER !
+            this.connected_users.add(new User(InetAddress.getByName("190.168.120.6"), "Claude"));
+            this.connected_users.add(new User(InetAddress.getByName("190.168.120.11"), "Alain"));
+
+        }
+        catch (UnknownHostException e) {
+            System.out.println("Unknown Host Address !\n");
+            System.exit(0);
+        }
         this.listObserver = new ArrayList<Observer>();
     }
 
@@ -93,7 +104,7 @@ public class BddManager implements Observable {
       return pseudo;
     }
 
-    public void addMessage(InetAddress source, InetAddress dest, byte[] data, String timestamp) {
+    public void addMessage(InetAddress source, InetAddress dest, byte[] data, String timestamp, String filetype) {
         String sql="";
         String source_address = source.getHostAddress();
         String dest_address = dest.getHostAddress();
@@ -108,29 +119,31 @@ public class BddManager implements Observable {
             this.bdd_statement = this.bdd_connection.createStatement();
 
             if(local_user.getIp().equals(source)) {
-                sql = "create table if not exists LOG_"+ dest_reformatted +" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(100), timestamp VARCHAR(20))";
+                sql = "create table if not exists LOG_"+ dest_reformatted +" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(100), timestamp VARCHAR(20), filetype VARCHAR(20))";
                 this.bdd_statement.executeUpdate(sql);
 
-                sql = "insert into LOG_" + dest_reformatted +" (source, dest, data, timestamp) values (?,?,?,?);";
+                sql = "insert into LOG_" + dest_reformatted +" (source, dest, data, timestamp, filetype) values (?,?,?,?,?);";
                 this.bdd_preparedstatement = this.bdd_connection.prepareStatement(sql);
                 this.bdd_preparedstatement.setString(1, source_address);
                 this.bdd_preparedstatement.setString(2, dest_address);
                 this.bdd_preparedstatement.setString(3, data_str);
                 this.bdd_preparedstatement.setString(4, timestamp);
+                this.bdd_preparedstatement.setString(5, filetype);
                 this.bdd_preparedstatement.executeUpdate();
 
                 notifyObserver("new_message_to_"+ dest_reformatted);
             }
             else if(local_user.getIp().equals(dest)) {
-                sql = "create table if not exists LOG_"+ source_reformatted +" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(100), timestamp VARCHAR(20))";
+                sql = "create table if not exists LOG_"+ source_reformatted +" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(100), timestamp VARCHAR(20), filetype VARCHAR(20))";
                 this.bdd_statement.executeUpdate(sql);
 
-                sql = "insert into LOG_" + source_reformatted +" (source, dest, data, timestamp) values (?,?,?,?);";
+                sql = "insert into LOG_" + source_reformatted +" (source, dest, data, timestamp, filetype) values (?,?,?,?,?);";
                 this.bdd_preparedstatement = this.bdd_connection.prepareStatement(sql);
                 this.bdd_preparedstatement.setString(1, source_address);
                 this.bdd_preparedstatement.setString(2, dest_address);
                 this.bdd_preparedstatement.setString(3, data_str);
                 this.bdd_preparedstatement.setString(4, timestamp);
+                this.bdd_preparedstatement.setString(5, filetype);
                 this.bdd_preparedstatement.executeUpdate();
 
                 notifyObserver("new_message_from_"+ source_reformatted);
@@ -154,7 +167,7 @@ public class BddManager implements Observable {
             this.bdd_connection = DriverManager.getConnection("jdbc:sqlite:app.db");
             this.bdd_statement = this.bdd_connection.createStatement();
 
-            String sql = "create table if not exists LOG_"+ target_reformatted +" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(100), timestamp VARCHAR(20))";
+            String sql = "create table if not exists LOG_"+ target_reformatted +" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(100), timestamp VARCHAR(20), filetype VARCHAR(20))";
             this.bdd_statement.executeUpdate(sql);
 
             sql = "select * from LOG_"+ target_reformatted +";";
@@ -165,12 +178,13 @@ public class BddManager implements Observable {
                 String dest = rs.getString("dest");
                 String data_str = rs.getString("data");
                 String timestamp = rs.getString("timestamp");
+                String filetype = rs.getString("filetype");
 
                 InetAddress source_address = InetAddress.getByName(source);
                 InetAddress dest_address = InetAddress.getByName(dest);
                 byte[] data = data_str.getBytes();
 
-                Message tmp_msg = new Message(source_address,dest_address,data,timestamp);
+                Message tmp_msg = new Message(source_address,dest_address,data,timestamp,filetype);
                 log.addMessage(tmp_msg);
             }
 

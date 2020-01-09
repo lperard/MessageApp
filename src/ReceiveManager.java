@@ -26,7 +26,8 @@ public class ReceiveManager implements Runnable{
             InetAddress dest = msg.getDest();
             byte[] data = msg.getData();
             String timestamp = msg.getTimestamp();
-            this.model.addMessage(source,dest,data,timestamp);
+            String filetype = msg.getFiletype();
+            this.model.addMessage(source,dest,data,timestamp,filetype);
         }
 
         public void processReceivedDataSys(MessageSys msys) {
@@ -83,14 +84,9 @@ public class ReceiveManager implements Runnable{
                   		processReceivedDataSys(message_sys_received);
                 	}
                 	else if (o.getClass().toString().compareTo("class Message") == 0){
-                		Message message_received = (Message) o;
+                		  Message message_received = (Message) o;
                     	processReceivedDataMsg(message_received);
                 	}
-                    else if (o.getClass().toString().compareTo("class java.io.File") == 0) {
-                        System.out.println("J'ai reçu un fichier !");
-                        File file = (File) o;
-                        System.out.println("Hashcode: " + file.hashCode());
-                    }
                 	else {
                 		System.out.println("Serialization inconnue !");
                 	}
