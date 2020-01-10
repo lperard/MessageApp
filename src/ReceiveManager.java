@@ -102,7 +102,7 @@ public class ReceiveManager implements Runnable{
                   		processReceivedDataSys(message_sys_received);
                 	}
                 	else if (o.getClass().toString().compareTo("class Message") == 0){
-                		  Message message_received = (Message) o;
+                		Message message_received = (Message) o;
                     	processReceivedDataMsg(message_received);
                 	}
                 	else {

@@ -27,24 +27,24 @@ public class SendManager {
     public void UDPserializeSend (Object obj, InetAddress distant) {
     	ByteArrayOutputStream outByte = null;
     	try{
-			    outByte = new ByteArrayOutputStream();
-          byte[] objectSerialized = null;
-          ObjectOutputStream objOut = new ObjectOutputStream(outByte);
+			outByte = new ByteArrayOutputStream();
+            byte[] objectSerialized = null;
+            ObjectOutputStream objOut = new ObjectOutputStream(outByte);
         	objOut.writeObject(obj); //envoi de l'objet serializé
         	objectSerialized = outByte.toByteArray();
         	DatagramPacket objPacket = new DatagramPacket(objectSerialized, objectSerialized.length, distant, 6000);
-          try{
+            try{
             	sock.send(objPacket);
             	System.out.println("Envoi d'un objet serializé");
             	outByte.close();
             	objOut.close();
-          } catch (IOException e) {
+            } catch (IOException e) {
             	e.printStackTrace();
-          }
-      }
+            }
+        }
     	catch (UnknownHostException uhe) {
     		  uhe.printStackTrace();
-		  }
+		}
     	catch (IOException e) {
     		  e.printStackTrace();
     	}

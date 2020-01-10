@@ -159,9 +159,9 @@ public class ChatWindow extends JFrame implements Observer {
             UserTabPane tab = (UserTabPane) history.getComponentAt(i);
             if(tab.getUserIp().getHostAddress().equals(tmp)) {
               UserTabPane new_tab = new UserTabPane(history, controler, tmp_address);
-              history.setComponentAt(i,new_tab);
               history.setBackgroundAt(i,Color.RED);
               history.setForegroundAt(i,Color.WHITE);
+              history.setComponentAt(i,new_tab);
               tab_already_exists = 1;
             }
           }
@@ -171,6 +171,7 @@ public class ChatWindow extends JFrame implements Observer {
             history.addTab(pseudo,tab);
             history.setTabComponentAt(history.getTabCount()-1,new ButtonTabComponent(history));
             history.setBackgroundAt(history.getTabCount()-1,Color.RED);
+            history.setBackground(Color.RED);
             history.setForegroundAt(history.getTabCount()-1,Color.WHITE);
           }
         }
@@ -211,8 +212,9 @@ public class ChatWindow extends JFrame implements Observer {
         this.addMouseListener(new MouseAdapter() {
           public void mouseClicked(MouseEvent e) {
             int index = pane.indexOfTabComponent(ButtonTabComponent.this);
+            System.out.println(pane.getBackgroundAt(index));
             if (pane.getBackgroundAt(index).equals(Color.RED)){
-              pane.setBackgroundAt(index, new Color(27,29,36));
+              pane.setBackgroundAt(index, new Color(247,246,246));
               pane.setForegroundAt(index, Color.BLACK);
             }
             pane.setSelectedIndex(index);
@@ -386,7 +388,11 @@ public class ChatWindow extends JFrame implements Observer {
 
       public void processMsg() {
         String msg = msg_to_send.getText();
-        if(!msg.equals("")) {
+        if(msg.length()>250) {
+            msg_to_send.setText("");
+            JOptionPane.showMessageDialog(null,"Les messages sont limités à 250 caractères !");
+        }
+        else if(!msg.equals("")) {
           msg_to_send.setText("");
           String dest_pseudo = containerPane.getTitleAt(containerPane.getSelectedIndex());
           controler.sendMessage(msg.getBytes(),dest_pseudo);
@@ -412,6 +418,7 @@ public class ChatWindow extends JFrame implements Observer {
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             file = file_chooser.getSelectedFile();
             String path = file.getAbsolutePath();
+            System.out.println(path);
             try {
                 BufferedImage bImage = ImageIO.read(new File(path));
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();

@@ -119,7 +119,7 @@ public class BddManager implements Observable {
             this.bdd_statement = this.bdd_connection.createStatement();
 
             if(local_user.getIp().equals(source)) {
-                sql = "create table if not exists LOG_"+ dest_reformatted +" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(100), timestamp VARCHAR(20), filetype VARCHAR(20))";
+                sql = "create table if not exists LOG_"+ dest_reformatted +" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(300), timestamp VARCHAR(20), filetype VARCHAR(20))";
                 this.bdd_statement.executeUpdate(sql);
 
                 sql = "insert into LOG_" + dest_reformatted +" (source, dest, data, timestamp, filetype) values (?,?,?,?,?);";
@@ -134,7 +134,7 @@ public class BddManager implements Observable {
                 notifyObserver("new_message_to_"+ dest_reformatted);
             }
             else if(local_user.getIp().equals(dest)) {
-                sql = "create table if not exists LOG_"+ source_reformatted +" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(100), timestamp VARCHAR(20), filetype VARCHAR(20))";
+                sql = "create table if not exists LOG_"+ source_reformatted +" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(300), timestamp VARCHAR(20), filetype VARCHAR(20))";
                 this.bdd_statement.executeUpdate(sql);
 
                 sql = "insert into LOG_" + source_reformatted +" (source, dest, data, timestamp, filetype) values (?,?,?,?,?);";
@@ -167,7 +167,7 @@ public class BddManager implements Observable {
             this.bdd_connection = DriverManager.getConnection("jdbc:sqlite:app.db");
             this.bdd_statement = this.bdd_connection.createStatement();
 
-            String sql = "create table if not exists LOG_"+ target_reformatted +" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(100), timestamp VARCHAR(20), filetype VARCHAR(20))";
+            String sql = "create table if not exists LOG_"+ target_reformatted +" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(300), timestamp VARCHAR(20), filetype VARCHAR(20))";
             this.bdd_statement.executeUpdate(sql);
 
             sql = "select * from LOG_"+ target_reformatted +";";
