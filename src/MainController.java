@@ -71,7 +71,7 @@ public class MainController {
     if(ip_dest!=null) {
       model.addMessage(ip_source, ip_dest, data, timestamp, "text");
       Message msg = new Message(ip_source, ip_dest, data, timestamp, "text");
-      com.getSendManager().UDPserializeSend(msg, ip_dest);
+      com.getSendManager().TCPserializedSend(msg, ip_dest);
     }
     else {
       System.out.println("Il semblerait que le destinataire n'est pas connecté !");
@@ -89,7 +89,7 @@ public class MainController {
     if(ip_dest!=null) {
       model.addMessage(ip_source, ip_dest, path.getBytes(), timestamp, "img");
       Message msg = new Message(ip_source, ip_dest, data, timestamp, "img", path);
-      com.getSendManager().UDPserializeSend(msg, ip_dest);
+      com.getSendManager().TCPserializedSend(msg, ip_dest);
     }
     else {
       System.out.println("Il semblerait que le destinataire n'est pas connecté !");

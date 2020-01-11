@@ -8,15 +8,11 @@ import java.io.Serializable;
 
 public class SendManager {
 
+    private int port;
     private DatagramSocket sock;
 
-    private int port;
-
-    private InetAddress addr_distant;
-
-    public SendManager(int port, InetAddress addr_distant){
+    public SendManager(int port){
         this.port = port;
-        this.addr_distant = addr_distant;
         try {this.sock = new DatagramSocket();}
         catch (Exception e) {
             System.err.println(e.getClass().getName()+":"+e.getMessage());
@@ -24,27 +20,40 @@ public class SendManager {
         }
     }
 
-    public void UDPserializeSend (Object obj, InetAddress distant) {
+    public void TCPserializedSend (Object obj, InetAddress distant) {
+      try{
+        Socket sock = new Socket(distant, port);
+  			ObjectOutputStream oos = new ObjectOutputStream(sock.getOutputStream());
+  			oos.writeObject(obj);
+  			oos.close();
+        System.out.println("Envoi d'un objet sérializé via TCP");
+  		}
+  		catch (Exception e) {
+  			e.printStackTrace();
+  		}
+    }
+
+    public void UDPserializedSend (Object obj, InetAddress distant) {
     	ByteArrayOutputStream outByte = null;
     	try{
-			outByte = new ByteArrayOutputStream();
-            byte[] objectSerialized = null;
-            ObjectOutputStream objOut = new ObjectOutputStream(outByte);
+			    outByte = new ByteArrayOutputStream();
+          byte[] objectSerialized = null;
+          ObjectOutputStream objOut = new ObjectOutputStream(outByte);
         	objOut.writeObject(obj); //envoi de l'objet serializé
         	objectSerialized = outByte.toByteArray();
-        	DatagramPacket objPacket = new DatagramPacket(objectSerialized, objectSerialized.length, distant, 6000);
-            try{
+        	DatagramPacket objPacket = new DatagramPacket(objectSerialized, objectSerialized.length, distant, port);
+          try{
             	sock.send(objPacket);
-            	System.out.println("Envoi d'un objet serializé");
+            	System.out.println("Envoi d'un objet serializé via UDP");
             	outByte.close();
             	objOut.close();
-            } catch (IOException e) {
+          } catch (IOException e) {
             	e.printStackTrace();
-            }
-        }
+          }
+      }
     	catch (UnknownHostException uhe) {
     		  uhe.printStackTrace();
-		}
+		  }
     	catch (IOException e) {
     		  e.printStackTrace();
     	}
@@ -52,7 +61,7 @@ public class SendManager {
 
     public void sendBroadcast (MessageSys msgSys) throws SocketException, UnknownHostException {
         this.sock.setBroadcast(true);
-        UDPserializeSend(msgSys, InetAddress.getByName("255.255.255.255"));
+        UDPserializedSend(msgSys, InetAddress.getByName("255.255.255.255"));
         this.sock.setBroadcast(false); //Pas forcement utile
     }
 }

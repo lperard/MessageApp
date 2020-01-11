@@ -7,24 +7,27 @@ public class SocketManager {
   private int sendPort;
   private int receivePort;
   protected SendManager sendM;
-  protected ReceiveManager receiveM;
+  protected ReceiveTCP receiveTCP;
+  protected ReceiveUDP receiveUDP;
 
   public SocketManager(BddManager model, int sendPort, int receivePort) {
     this.sendPort = sendPort;
     this.receivePort = receivePort;
 
     try{
-        InetAddress host = InetAddress.getLocalHost();
-        this.sendM = new SendManager(sendPort, host);
+        this.sendM = new SendManager(receivePort);
     }
     catch (Exception e){
         System.out.println("Unknown Host Address !\n");
         System.exit(0);
     }
-    this.receiveM = new ReceiveManager(receivePort,model,this.sendM);
+    this.receiveUDP = new ReceiveUDP(receivePort,model,this.sendM);
+    this.receiveTCP = new ReceiveTCP(receivePort,model,this.sendM);
 
-    Thread receive = new Thread(receiveM);
-    receive.start();
+    Thread udp = new Thread(receiveUDP);
+    udp.start();
+    Thread tcp = new Thread(receiveTCP);
+    tcp.start();
     System.out.println("On a lancé les threads");
   }
 
