@@ -13,10 +13,11 @@ public class ReceiveTCP implements Runnable {
     this.model = model;
     this.sendM = sendM;
     try {
-      servsock = new ServerSocket(this.port + 1);
+      servsock = new ServerSocket(this.port);
     } catch (Exception e) {
       e.printStackTrace();
     }
+    System.out.println("Le port que j'utilise pour recevoir : "+port);
   }
 
   public void processReceivedDataMsg(Message msg) {
@@ -80,26 +81,26 @@ public class ReceiveTCP implements Runnable {
 
   public void TCPserializedReceive() {
     try {
-      Socket sock = this.servsock.accept();
-			ObjectInputStream objectInput = new ObjectInputStream(sock.getInputStream());
-			Object ObjReceived = objectInput.readObject();
-			if (ObjReceived.getClass().toString().compareTo("class MessageSys") == 0) {
-        		MessageSys message_sys_received = (MessageSys) ObjReceived;
-        		System.out.println("TCP: received serialized Message Sys");
-        		System.out.println(message_sys_received.toString());
-        	}
-        	else if (ObjReceived.getClass().toString().compareTo("class Message") == 0){
-        		Message message_received = (Message) ObjReceived;
-        		System.out.println("TCP: received serialized Message");
-        		System.out.println(message_received.toString());
-        	}
-        	else {
-        		System.out.println("Unrecognized serialization");
-        	}
-			}
-		catch (IOException|ClassNotFoundException e) {
-			e.printStackTrace();
-		}
+        Socket sock = this.servsock.accept();
+		ObjectInputStream objectInput = new ObjectInputStream(sock.getInputStream());
+		Object ObjReceived = objectInput.readObject();
+		if (ObjReceived.getClass().toString().compareTo("class MessageSys") == 0) {
+    		MessageSys message_sys_received = (MessageSys) ObjReceived;
+    		System.out.println("TCP: received serialized Message Sys");
+    		processReceivedDataSys(message_sys_received);
+    	}
+    	else if (ObjReceived.getClass().toString().compareTo("class Message") == 0){
+    		Message message_received = (Message) ObjReceived;
+    		System.out.println("TCP: received serialized Message");
+    		processReceivedDataMsg(message_received);
+    	}
+    	else {
+    		System.out.println("Unrecognized serialization");
+    	}
+	}
+	catch (IOException|ClassNotFoundException e) {
+		e.printStackTrace();
+	}
   }
 
 }

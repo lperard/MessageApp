@@ -18,16 +18,17 @@ public class SendManager {
             System.err.println(e.getClass().getName()+":"+e.getMessage());
             System.exit(0);
         }
+        System.out.println("Le port vers lequel je veux envoyer : "+port);
     }
 
     public void TCPserializedSend (Object obj, InetAddress distant) {
-      try{
-        Socket sock = new Socket(distant, port);
-  			ObjectOutputStream oos = new ObjectOutputStream(sock.getOutputStream());
-  			oos.writeObject(obj);
-  			oos.close();
-        System.out.println("Envoi d'un objet sérializé via TCP");
-  		}
+        try{
+            Socket sock = new Socket(distant, port);
+      		ObjectOutputStream oos = new ObjectOutputStream(sock.getOutputStream());
+      		oos.writeObject(obj);
+      		oos.close();
+            System.out.println("Envoi d'un objet sérializé via TCP");
+  	    }
   		catch (Exception e) {
   			e.printStackTrace();
   		}

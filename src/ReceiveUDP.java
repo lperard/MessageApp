@@ -93,13 +93,14 @@ public class ReceiveUDP implements Runnable {
           try {
             ObjectInput inObj = new ObjectInputStream(inStream);
             Object o = inObj.readObject();
-              System.out.println("Reception d'un objet serializé");
             if (o.getClass().toString().compareTo("class MessageSys") == 0) {
                 MessageSys message_sys_received = (MessageSys) o;
+                System.out.println("UDP: received serialized Message Sys");
                 processReceivedDataSys(message_sys_received);
             }
             else if (o.getClass().toString().compareTo("class Message") == 0){
-              Message message_received = (Message) o;
+                Message message_received = (Message) o;
+                System.out.println("UDP: received serialized Message");
                 processReceivedDataMsg(message_received);
             }
             else {
