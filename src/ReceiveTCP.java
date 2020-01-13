@@ -29,7 +29,7 @@ public class ReceiveTCP implements Runnable {
       String filetype = msg.getFiletype();
       if(filetype.equals("text"))
         this.model.addMessage(source,dest,data,timestamp,filetype);
-      else {
+      else if(filetype.equals("img")) {
         // On sauvegarde l'image dans nos fichiers
         String path = msg.getFilepath();
         int index = path.lastIndexOf("/");
@@ -37,7 +37,7 @@ public class ReceiveTCP implements Runnable {
           index = path.lastIndexOf("\\");
         }
         String filename = path.substring(index + 1);
-        File file = new File("img/"+filename);
+        File file = new File("tmp/"+filename);
         try {
             file.createNewFile();
 

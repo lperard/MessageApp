@@ -424,6 +424,8 @@ public class ChatWindow extends JFrame implements Observer {
                 String file_extension = path.substring(index + 1);
                 System.out.println("extension : "+file_extension);
             
+                // ICI TU POURRAS METTRE UN IF SELON LE TYPE D'EXTENSION DE FICHIER !
+
                 BufferedImage bImage = ImageIO.read(new File(path));
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
                 ImageIO.write(bImage, file_extension, bos);
@@ -461,6 +463,7 @@ public class ChatWindow extends JFrame implements Observer {
         private String filetype;
 
         private JTextArea message_content;
+        private JLabel picLabel;
         private JLabel time_info;
 
         public MessageHistory(Message msg, MainController controler) {
@@ -499,33 +502,36 @@ public class ChatWindow extends JFrame implements Observer {
 
           if(this.filetype.equals("text")) {
             message_content = new JTextArea(data_str);
+            message_content.setLineWrap(true);
+            message_content.setWrapStyleWord(true);
+            message_content.setEditable(false);
+            message_content.setBackground(new Color(0,0,0,0));
+            message_content.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+            this.add(message_content, BorderLayout.CENTER);
+
+            this.setMaximumSize(new Dimension(700,100));
           }
           else if(this.filetype.equals("img")) {
-            // Si on est l'expéditeur on affiche le path de l'image envoyée
-            if(from_me) {
-              message_content = new JTextArea("Envoi de l'image " + data_str);
-            }
-            // Si on est le destinataire on affiche le path vers l'image reçue
-            else {
-              message_content = new JTextArea("Image reçue " + data_str);
-            }
+            // Est-ce qu'il faudrait enregistrer en local aussi les images envoyées ? Je pense que oui        
 
-            Font font_img = new Font("Courier", Font.ITALIC, 14);
-            message_content.setFont(font_img);
+            try {
+                BufferedImage img = ImageIO.read(new File(data_str));
+                picLabel = new JLabel(new ImageIcon(img));
+                this.add(picLabel, BorderLayout.CENTER);
+                
+                int height = img.getHeight() + 100;
+                int width = Math.max(700, img.getWidth() + 100);
+                this.setMaximumSize(new Dimension(width,height));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
           }
           else if(this.filetype.equals("file")) {
-
+                
           }
           else {
             System.out.println("Unrecognized filetype !");
           }
-
-          message_content.setLineWrap(true);
-          message_content.setWrapStyleWord(true);
-          message_content.setEditable(false);
-          message_content.setBackground(new Color(0,0,0,0));
-          message_content.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-          this.add(message_content, BorderLayout.CENTER);
 
           // On met des bordures de couleur différente en fonction de la source du message
           if(from_me) {
@@ -540,7 +546,7 @@ public class ChatWindow extends JFrame implements Observer {
           //this.add(Box.createRigidArea(new Dimension(0,5)));
           this.add(time_info, BorderLayout.PAGE_END);
 
-          this.setMaximumSize(new Dimension(700,100));;
+          //this.setMaximumSize(new Dimension(700,100));
         }
 
       }

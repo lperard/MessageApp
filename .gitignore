@@ -3,5 +3,3 @@
 .project
 .classpath
 app.db
-img/*
-!img/user_icon.png
