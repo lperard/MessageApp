@@ -18,7 +18,6 @@ public class SendManager {
             System.err.println(e.getClass().getName()+":"+e.getMessage());
             System.exit(0);
         }
-        System.out.println("Le port vers lequel je veux envoyer : "+port);
     }
 
     public void TCPserializedSend (Object obj, InetAddress distant) {
@@ -37,21 +36,21 @@ public class SendManager {
     public void UDPserializedSend (Object obj, InetAddress distant) {
     	ByteArrayOutputStream outByte = null;
     	try{
-			    outByte = new ByteArrayOutputStream();
-          byte[] objectSerialized = null;
-          ObjectOutputStream objOut = new ObjectOutputStream(outByte);
-        	objOut.writeObject(obj); //envoi de l'objet serializé
+		    outByte = new ByteArrayOutputStream();
+            byte[] objectSerialized = null;
+            ObjectOutputStream objOut = new ObjectOutputStream(outByte);
+            objOut.writeObject(obj); //envoi de l'objet serializé
         	objectSerialized = outByte.toByteArray();
         	DatagramPacket objPacket = new DatagramPacket(objectSerialized, objectSerialized.length, distant, port);
-          try{
+            try{
             	sock.send(objPacket);
             	System.out.println("Envoi d'un objet serializé via UDP");
             	outByte.close();
             	objOut.close();
-          } catch (IOException e) {
+            } catch (IOException e) {
             	e.printStackTrace();
-          }
-      }
+            }
+        }
     	catch (UnknownHostException uhe) {
     		  uhe.printStackTrace();
 		  }

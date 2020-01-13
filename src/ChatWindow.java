@@ -418,13 +418,16 @@ public class ChatWindow extends JFrame implements Observer {
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             file = file_chooser.getSelectedFile();
             String path = file.getAbsolutePath();
-            System.out.println(path);
             try {
+                // On récupère l'extension du fichier
+                int index = path.lastIndexOf(".");
+                String file_extension = path.substring(index + 1);
+                System.out.println("extension : "+file_extension);
+            
                 BufferedImage bImage = ImageIO.read(new File(path));
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                ImageIO.write(bImage, "jpg", bos);
+                ImageIO.write(bImage, file_extension, bos);
                 byte[] data = bos.toByteArray();
-                System.out.println("Hashcode :" + file.hashCode());
                 String dest_pseudo = containerPane.getTitleAt(containerPane.getSelectedIndex());
                 controler.sendImage(path,data,dest_pseudo);
             } catch (Exception e) {

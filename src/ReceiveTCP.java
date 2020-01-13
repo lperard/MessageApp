@@ -1,5 +1,7 @@
 import java.net.*;
 import java.io.*;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
 
 public class ReceiveTCP implements Runnable {
 
@@ -17,7 +19,6 @@ public class ReceiveTCP implements Runnable {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    System.out.println("Le port que j'utilise pour recevoir : "+port);
   }
 
   public void processReceivedDataMsg(Message msg) {
@@ -36,12 +37,22 @@ public class ReceiveTCP implements Runnable {
           index = path.lastIndexOf("\\");
         }
         String filename = path.substring(index + 1);
-        File file = new File(filename);
+        File file = new File("img/"+filename);
         try {
-          file.createNewFile();
+            file.createNewFile();
+
+            // On récupère l'extension du fichier
+            index = filename.lastIndexOf(".");
+            String file_extension = filename.substring(index + 1);
+            System.out.println("extension : "+file_extension);
+
+            ByteArrayInputStream inStream = new ByteArrayInputStream(data);
+            BufferedImage bImg = ImageIO.read(inStream);
+            ImageIO.write(bImg, file_extension, file);
         } catch (Exception e) {
-          e.printStackTrace();
+            e.printStackTrace();
         }
+
         // On ajoute à la bdd un message avec le path du fichier
         this.model.addMessage(source,dest,file.getAbsolutePath().getBytes(),timestamp,filetype);
       }
