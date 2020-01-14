@@ -472,6 +472,7 @@ public class ChatWindow extends JFrame implements Observer {
 
         private JTextArea message_content;
         private JLabel picLabel;
+        private JButton download_file;
         private JLabel time_info;
 
         public MessageHistory(Message msg, MainController controler) {
@@ -532,7 +533,21 @@ public class ChatWindow extends JFrame implements Observer {
             }
           }
           else if(this.filetype.equals("file")) {
-                
+            int index = data_str.lastIndexOf("/");
+            if(index == -1) {
+              index = data_str.lastIndexOf("\\");
+            }
+            String filename = data_str.substring(index + 1);
+            download_file = new JButton("Télécharger "+ filename);
+            this.add(download_file, BorderLayout.CENTER);
+
+            this.setMaximumSize(new Dimension(700,100));
+
+            download_file.addMouseListener(new MouseAdapter() {
+              public void mouseClicked(MouseEvent e) {
+                // A REMPLIR AVEC UN FILECHOOSER showSaveDialog !
+              }
+            });
           }
           else {
             System.out.println("Unrecognized filetype !");
