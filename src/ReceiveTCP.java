@@ -60,6 +60,32 @@ public class ReceiveTCP implements Runnable {
         // On ajoute à la bdd un message avec le path du fichier
         this.model.addMessage(source,dest,file.getAbsolutePath().getBytes(),timestamp,filetype);
       }
+      else if(filetype.equals("file")) {
+        // On sauvegarde l'image dans nos fichiers
+        String path = msg.getFilepath();
+        int index = path.lastIndexOf("/");
+        if(index == -1) {
+          index = path.lastIndexOf("\\");
+        }
+        String filename = path.substring(index + 1);
+        File file = new File("tmp/"+filename);
+        try {
+            file.createNewFile();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            OutputStream os = new FileOutputStream(file);
+            os.write(data);
+            os.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // On ajoute à la bdd un message avec le path du fichier
+        this.model.addMessage(source,dest,file.getAbsolutePath().getBytes(),timestamp,filetype);
+      }
   }
 
   public void processReceivedDataSys(MessageSys msys) {

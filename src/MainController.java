@@ -126,6 +126,46 @@ public class MainController {
     }
   }
 
+    public void sendFile(String path, byte[] data, String dest_pseudo) {
+        InetAddress ip_source = model.getLocalUser().getIp();
+        InetAddress ip_dest = model.getIpFromPseudo(dest_pseudo);
+
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        LocalDateTime now = LocalDateTime.now();
+        String timestamp = new String(dtf.format(now));
+
+        if(ip_dest!=null) {
+            // On sauvegarde l'image dans nos fichiers
+            int index = path.lastIndexOf("/");
+            if(index == -1) {
+              index = path.lastIndexOf("\\");
+            }
+            String filename = path.substring(index + 1);
+            File file = new File("tmp/"+filename);
+            try {
+                file.createNewFile();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            try {
+                OutputStream os = new FileOutputStream(file);
+                os.write(data);
+                os.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            // On ajoute à la bdd un message avec le path du fichier
+            model.addMessage(ip_source, ip_dest, file.getAbsolutePath().getBytes(), timestamp, "file");
+            Message msg = new Message(ip_source, ip_dest, data, timestamp, "file", path);
+            com.getSendManager().TCPserializedSend(msg, ip_dest);
+        }
+        else {
+            System.out.println("Il semblerait que le destinataire n'est pas connecté !");
+        }
+      }
+
   public SocketManager getSocketManager() {
     return this.com;
   }

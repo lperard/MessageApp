@@ -165,7 +165,7 @@ public class ChatWindow extends JFrame implements Observer {
             if(tab.getUserIp().getHostAddress().equals(tmp)) {
               UserTabPane new_tab = new UserTabPane(history, controler, tmp_address);
               history.setComponentAt(i,new_tab);
-              history.setTitleAt(i, history.getTitleAt(i) + " *");
+              history.setTitleAt(i, history.getTitleAt(i).replace("*","") + " *");
               tab_already_exists = 1;
             }
           }
@@ -431,16 +431,14 @@ public class ChatWindow extends JFrame implements Observer {
                     String dest_pseudo = containerPane.getTitleAt(containerPane.getSelectedIndex());
                     controler.sendImage(path,data,dest_pseudo);
                 }
-                else if(file_extension.equals("pdf") || file_extension.equals("txt")) {
+                else {
+
                     byte[] data = new byte [(int)file.length()];
                     FileInputStream fis = new FileInputStream(file);
                     BufferedInputStream bis = new BufferedInputStream(fis);
                     bis.read(data,0,data.length);
                     String dest_pseudo = containerPane.getTitleAt(containerPane.getSelectedIndex());
                     controler.sendFile(path,data,dest_pseudo);
-                }
-                else {
-                    System.out.println("Unsupported file format !");
                 }
             } catch (Exception e) {
                 System.err.println(e.getClass().getName()+":"+e.getMessage());
