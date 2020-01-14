@@ -40,7 +40,11 @@ public class ReceiveTCP implements Runnable {
         File file = new File("tmp/"+filename);
         try {
             file.createNewFile();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
+        try {
             // On récupère l'extension du fichier
             index = filename.lastIndexOf(".");
             String file_extension = filename.substring(index + 1);

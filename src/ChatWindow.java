@@ -159,20 +159,16 @@ public class ChatWindow extends JFrame implements Observer {
             UserTabPane tab = (UserTabPane) history.getComponentAt(i);
             if(tab.getUserIp().getHostAddress().equals(tmp)) {
               UserTabPane new_tab = new UserTabPane(history, controler, tmp_address);
-              history.setBackgroundAt(i,Color.RED);
-              history.setForegroundAt(i,Color.WHITE);
               history.setComponentAt(i,new_tab);
+              history.setTitleAt(i, history.getTitleAt(i) + "*");
               tab_already_exists = 1;
             }
           }
           if(tab_already_exists == 0) {
             UserTabPane tab = new UserTabPane(history, controler, tmp_address);
             String pseudo = controler.getModel().getPseudoFromIP(tmp_address);
-            history.addTab(pseudo,tab);
+            history.addTab(pseudo + " *",tab);
             history.setTabComponentAt(history.getTabCount()-1,new ButtonTabComponent(history));
-            history.setBackgroundAt(history.getTabCount()-1,Color.RED);
-            history.setBackground(Color.RED);
-            history.setForegroundAt(history.getTabCount()-1,Color.WHITE);
           }
         }
         catch (Exception e) {
@@ -212,13 +208,10 @@ public class ChatWindow extends JFrame implements Observer {
         this.addMouseListener(new MouseAdapter() {
           public void mouseClicked(MouseEvent e) {
             int index = pane.indexOfTabComponent(ButtonTabComponent.this);
-            System.out.println(pane.getBackgroundAt(index));
-            if (pane.getBackgroundAt(index).equals(Color.RED)){
-              pane.setBackgroundAt(index, new Color(247,246,246));
-              pane.setForegroundAt(index, Color.BLACK);
+            if (pane.getTitleAt(index).contains(" *")){
+              pane.setTitleAt(index, pane.getTitleAt(index).replace(" *",""));
             }
             pane.setSelectedIndex(index);
-            System.out.println(pane.getBackgroundAt(index));
           }
         });
       }

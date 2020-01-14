@@ -2,6 +2,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
 import java.net.*;
 import java.io.*;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
 
 public class MainController {
 
@@ -97,6 +99,19 @@ public class MainController {
         File file = new File("tmp/"+filename);
         try {
             file.createNewFile();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            // On récupère l'extension du fichier
+            index = filename.lastIndexOf(".");
+            String file_extension = filename.substring(index + 1);
+            System.out.println("extension : "+file_extension);
+
+            ByteArrayInputStream inStream = new ByteArrayInputStream(data);
+            BufferedImage bImg = ImageIO.read(inStream);
+            ImageIO.write(bImg, file_extension, file);
         } catch (Exception e) {
             e.printStackTrace();
         }
