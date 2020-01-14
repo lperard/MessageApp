@@ -520,8 +520,7 @@ public class ChatWindow extends JFrame implements Observer {
                 this.add(picLabel, BorderLayout.CENTER);
                 
                 int height = img.getHeight() + 100;
-                int width = Math.max(700, img.getWidth() + 100);
-                this.setMaximumSize(new Dimension(width,height));
+                this.setMaximumSize(new Dimension(700,height));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -543,10 +542,7 @@ public class ChatWindow extends JFrame implements Observer {
             this.setBorder(BorderFactory.createTitledBorder(blueLine, info));
           }
 
-          //this.add(Box.createRigidArea(new Dimension(0,5)));
           this.add(time_info, BorderLayout.PAGE_END);
-
-          //this.setMaximumSize(new Dimension(700,100));
         }
 
       }
