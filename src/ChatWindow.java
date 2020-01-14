@@ -512,8 +512,6 @@ public class ChatWindow extends JFrame implements Observer {
             this.setMaximumSize(new Dimension(700,100));
           }
           else if(this.filetype.equals("img")) {
-            // Est-ce qu'il faudrait enregistrer en local aussi les images envoyées ? Je pense que oui        
-
             try {
                 BufferedImage img = ImageIO.read(new File(data_str));
                 picLabel = new JLabel(new ImageIcon(img));

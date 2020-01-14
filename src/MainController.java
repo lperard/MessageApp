@@ -1,6 +1,7 @@
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
 import java.net.*;
+import java.io.*;
 
 public class MainController {
 
@@ -87,12 +88,26 @@ public class MainController {
     String timestamp = new String(dtf.format(now));
 
     if(ip_dest!=null) {
-      model.addMessage(ip_source, ip_dest, path.getBytes(), timestamp, "img");
-      Message msg = new Message(ip_source, ip_dest, data, timestamp, "img", path);
-      com.getSendManager().TCPserializedSend(msg, ip_dest);
+        // On sauvegarde l'image dans nos fichiers
+        int index = path.lastIndexOf("/");
+        if(index == -1) {
+          index = path.lastIndexOf("\\");
+        }
+        String filename = path.substring(index + 1);
+        File file = new File("tmp/"+filename);
+        try {
+            file.createNewFile();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // On ajoute à la bdd un message avec le path du fichier
+        model.addMessage(ip_source, ip_dest, file.getAbsolutePath().getBytes(), timestamp, "img");
+        Message msg = new Message(ip_source, ip_dest, data, timestamp, "img", path);
+        com.getSendManager().TCPserializedSend(msg, ip_dest);
     }
     else {
-      System.out.println("Il semblerait que le destinataire n'est pas connecté !");
+        System.out.println("Il semblerait que le destinataire n'est pas connecté !");
     }
   }
 
