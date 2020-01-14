@@ -67,7 +67,8 @@ public class ChatWindow extends JFrame implements Observer {
             String selectedItem = (String) user_list.getSelectedValue();
             int tabExists = -1;
             for(int i = 0; i<history.getTabCount(); i++) {
-              if(history.getTitleAt(i).equals(selectedItem)) {
+              String tabTitle = history.getTitleAt(i).replace(" *","");
+              if(tabTitle.equals(selectedItem)) {
                 tabExists = i;
               }
             }
@@ -79,7 +80,11 @@ public class ChatWindow extends JFrame implements Observer {
               history.setSelectedIndex(history.getTabCount()-1);
             }
             else {
-              history.setSelectedIndex(tabExists);
+                history.setSelectedIndex(tabExists);
+                // On enlève le * de notification
+                if(history.getTitleAt(tabExists).contains(" *")) {
+                    history.setTitleAt(tabExists, history.getTitleAt(tabExists).replace(" *",""));
+                }
             }
           }
         }
@@ -160,7 +165,7 @@ public class ChatWindow extends JFrame implements Observer {
             if(tab.getUserIp().getHostAddress().equals(tmp)) {
               UserTabPane new_tab = new UserTabPane(history, controler, tmp_address);
               history.setComponentAt(i,new_tab);
-              history.setTitleAt(i, history.getTitleAt(i) + "*");
+              history.setTitleAt(i, history.getTitleAt(i) + " *");
               tab_already_exists = 1;
             }
           }
@@ -417,14 +422,26 @@ public class ChatWindow extends JFrame implements Observer {
                 String file_extension = path.substring(index + 1);
                 System.out.println("extension : "+file_extension);
             
-                // ICI TU POURRAS METTRE UN IF SELON LE TYPE D'EXTENSION DE FICHIER !
+                if(file_extension.equals("jpg") || file_extension.equals("jpeg") || file_extension.equals("png") || file_extension.equals("bmp") || file_extension.equals("svg")) {
 
-                BufferedImage bImage = ImageIO.read(new File(path));
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                ImageIO.write(bImage, file_extension, bos);
-                byte[] data = bos.toByteArray();
-                String dest_pseudo = containerPane.getTitleAt(containerPane.getSelectedIndex());
-                controler.sendImage(path,data,dest_pseudo);
+                    BufferedImage bImage = ImageIO.read(new File(path));
+                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                    ImageIO.write(bImage, file_extension, bos);
+                    byte[] data = bos.toByteArray();
+                    String dest_pseudo = containerPane.getTitleAt(containerPane.getSelectedIndex());
+                    controler.sendImage(path,data,dest_pseudo);
+                }
+                else if(file_extension.equals("pdf") || file_extension.equals("txt")) {
+                    byte[] data = new byte [(int)file.length()];
+                    FileInputStream fis = new FileInputStream(file);
+                    BufferedInputStream bis = new BufferedInputStream(fis);
+                    bis.read(data,0,data.length);
+                    String dest_pseudo = containerPane.getTitleAt(containerPane.getSelectedIndex());
+                    controler.sendFile(path,data,dest_pseudo);
+                }
+                else {
+                    System.out.println("Unsupported file format !");
+                }
             } catch (Exception e) {
                 System.err.println(e.getClass().getName()+":"+e.getMessage());
             }
