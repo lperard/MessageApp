@@ -316,7 +316,6 @@ public class ChatWindow extends JFrame implements Observer {
       private JPanel msgPane = new JPanel();
       private JButton send_button = new JButton("Envoyer");
       private JTextField msg_to_send = new JTextField();
-      private JFileChooser file_chooser = new JFileChooser();
       private JButton open_button = new JButton("Importer");
 
       public UserTabPane(final JTabbedPane containerPane, final MainController controler, InetAddress user_ip) {
@@ -391,9 +390,9 @@ public class ChatWindow extends JFrame implements Observer {
             JOptionPane.showMessageDialog(null,"Les messages sont limités à 250 caractères !");
         }
         else if(!msg.equals("")) {
-          msg_to_send.setText("");
-          String dest_pseudo = containerPane.getTitleAt(containerPane.getSelectedIndex());
-          controler.sendMessage(msg.getBytes(),dest_pseudo);
+            msg_to_send.setText("");
+            String dest_pseudo = containerPane.getTitleAt(containerPane.getSelectedIndex());
+            controler.sendMessage(msg.getBytes(),dest_pseudo);
         }
         else {
           Object[] options = {"Envoyer quand même", "Annuler"};
@@ -411,6 +410,7 @@ public class ChatWindow extends JFrame implements Observer {
       }
 
       public void processFile() {
+        JFileChooser file_chooser = new JFileChooser();
         int returnVal = file_chooser.showOpenDialog(file_chooser);
 
         if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -545,7 +545,34 @@ public class ChatWindow extends JFrame implements Observer {
 
             download_file.addMouseListener(new MouseAdapter() {
               public void mouseClicked(MouseEvent e) {
-                // A REMPLIR AVEC UN FILECHOOSER showSaveDialog !
+                String filename = download_file.getText().replace("Télécharger ","");
+
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("Sauvegarder sous");
+                fileChooser.setSelectedFile(new File(filename));   
+                 
+                int userSelection = fileChooser.showSaveDialog(download_file);
+                 
+                if (userSelection == JFileChooser.APPROVE_OPTION) {
+                    try {
+                        String file_path = "tmp/" + filename;
+                        File fileToSave = new File(file_path);
+
+                        File savedFile = fileChooser.getSelectedFile();
+                        savedFile.createNewFile();
+
+                        byte[] file_content = new byte [(int)fileToSave.length()];
+                        FileInputStream fis = new FileInputStream(fileToSave);
+                        BufferedInputStream bis = new BufferedInputStream(fis);
+                        bis.read(file_content,0,file_content.length);
+
+                        OutputStream os = new FileOutputStream(savedFile);
+                        os.write(file_content);
+                        os.close();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
               }
             });
           }
