@@ -48,7 +48,6 @@ public class ReceiveTCP implements Runnable {
             // On récupère l'extension du fichier
             index = filename.lastIndexOf(".");
             String file_extension = filename.substring(index + 1);
-            System.out.println("extension : "+file_extension);
 
             ByteArrayInputStream inStream = new ByteArrayInputStream(data);
             BufferedImage bImg = ImageIO.read(inStream);

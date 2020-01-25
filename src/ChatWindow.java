@@ -133,8 +133,43 @@ public class ChatWindow extends JFrame implements Observer {
     // Implémentation du pattern observer
     public void update(String str) {
       System.out.println(str);
-      if(str.equals("new_user_online") || str.equals("new_user_offline")) {
+      if(str.equals("new_user_online")) {
         user_list.setListData(controler.getModel().getPseudoList());
+      }
+      else if(str.contains("new_user_offline_")) {
+        user_list.setListData(controler.getModel().getPseudoList());
+        String tmp = str.replace("new_user_offline_","");
+        try {
+          InetAddress tmp_address = InetAddress.getByName(tmp);
+          for(int i=0; i<history.getTabCount(); i++) {
+            UserTabPane tab = (UserTabPane) history.getComponentAt(i);
+            if(tab.getUserIp().getHostAddress().equals(tmp)) {
+              history.remove(i);
+            }
+          }
+        }
+        catch (Exception e) {
+          System.err.println(e.getClass().getName()+":"+e.getMessage());
+          System.exit(0);
+        }
+      }
+      else if(str.contains("new_pseudo_")) {
+        user_list.setListData(controler.getModel().getPseudoList());
+        String tmp = str.replace("new_pseudo_","");
+        try {
+          InetAddress tmp_address = InetAddress.getByName(tmp);
+          for(int i=0; i<history.getTabCount(); i++) {
+            UserTabPane tab = (UserTabPane) history.getComponentAt(i);
+            if(tab.getUserIp().getHostAddress().equals(tmp)) {
+              String new_pseudo = controler.getModel().getPseudoFromIP(tab.getUserIp());
+              history.setTitleAt(i,new_pseudo);
+            }
+          }
+        }
+        catch (Exception e) {
+          System.err.println(e.getClass().getName()+":"+e.getMessage());
+          System.exit(0);
+        }
       }
       else if(str.contains("new_message_to_")) {
         String tmp = str.replace("new_message_to_","");
@@ -421,7 +456,7 @@ public class ChatWindow extends JFrame implements Observer {
                 int index = path.lastIndexOf(".");
                 String file_extension = path.substring(index + 1);
                 System.out.println("extension : "+file_extension);
-            
+
                 if(file_extension.equals("jpg") || file_extension.equals("jpeg") || file_extension.equals("png") || file_extension.equals("bmp") || file_extension.equals("svg")) {
 
                     BufferedImage bImage = ImageIO.read(new File(path));
@@ -525,7 +560,7 @@ public class ChatWindow extends JFrame implements Observer {
                 BufferedImage img = ImageIO.read(new File(data_str));
                 picLabel = new JLabel(new ImageIcon(img));
                 this.add(picLabel, BorderLayout.CENTER);
-                
+
                 int height = img.getHeight() + 100;
                 this.setMaximumSize(new Dimension(700,height));
             } catch (Exception e) {
@@ -549,10 +584,10 @@ public class ChatWindow extends JFrame implements Observer {
 
                 JFileChooser fileChooser = new JFileChooser();
                 fileChooser.setDialogTitle("Sauvegarder sous");
-                fileChooser.setSelectedFile(new File(filename));   
-                 
+                fileChooser.setSelectedFile(new File(filename));
+
                 int userSelection = fileChooser.showSaveDialog(download_file);
-                 
+
                 if (userSelection == JFileChooser.APPROVE_OPTION) {
                     try {
                         String file_path = "tmp/" + filename;

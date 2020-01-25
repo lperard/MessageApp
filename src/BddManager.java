@@ -20,18 +20,7 @@ public class BddManager implements Observable {
 
         this.connected_users = new ArrayList<User>();
 
-        try {
-            this.local_user = new User(address,"");
-
-            // POUR LES TESTS A ENLEVER !
-            this.connected_users.add(new User(InetAddress.getByName("190.168.120.6"), "Claude"));
-            this.connected_users.add(new User(InetAddress.getByName("190.168.120.11"), "Alain"));
-
-        }
-        catch (UnknownHostException e) {
-            System.out.println("Unknown Host Address !\n");
-            System.exit(0);
-        }
+        this.local_user = new User(address,"",false);
         this.listObserver = new ArrayList<Observer>();
     }
 
@@ -66,8 +55,19 @@ public class BddManager implements Observable {
       }
       if(index!=-1) {
         this.connected_users.remove(index);
-        notifyObserver("new_user_offline");
+        notifyObserver("new_user_offline_"+user.getIp());
       }
+    }
+
+    public void newPseudo(User user) {
+      for(int i=0; i<this.connected_users.size();i++) {
+        User current = this.connected_users.get(i);
+        if(current.getIp().equals(user.getIp())) {
+          this.connected_users.remove(i);
+        }
+      }
+      this.connected_users.add(user);
+      notifyObserver("new_pseudo_"+user.getIp());
     }
 
     public ArrayList<User> getUserList() {

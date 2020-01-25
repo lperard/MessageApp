@@ -9,10 +9,12 @@ public class MainController {
 
   private BddManager model;
   private SocketManager com;
+  private HttpHandler httpH;
 
-  public MainController(BddManager model, int sendPort, int receivePort) {
+  public MainController(BddManager model, int sendPort, int receivePort, InetAddress ip) {
     this.model = model;
-    this.com = new SocketManager(this.model, sendPort, receivePort);
+    this.com = new SocketManager(this.model, sendPort, receivePort, ip);
+    this.httpH = new HttpHandler(this.model);
     MessageSys sys = new MessageSys(Type.Hello, this.model.getLocalUser());
     try {
     	this.com.getSendManager().sendBroadcast(sys);
@@ -20,6 +22,9 @@ public class MainController {
     	System.out.println("Unknown Host Address !\n");
         System.exit(0);
     }
+
+    Thread http = new Thread(httpH);
+    http.start();
   }
 
   public BddManager getModel() {
@@ -28,38 +33,42 @@ public class MainController {
 
   public void connect(String pseudo) {
     User local_user = model.getLocalUser();
-    User new_user = new User(local_user.getIp(),pseudo);
+    User new_user = new User(local_user.getIp(),pseudo,true);
     model.setLocalUser(new_user);
     MessageSys sys = new MessageSys(Type.Connected, this.model.getLocalUser());
     try {
-    	this.com.getSendManager().sendBroadcast(sys);
+    	 this.com.getSendManager().sendBroadcast(sys);
     } catch (Exception e) {
-    	System.out.println("Unknown Host Address !\n");
-        System.exit(0);
+    	 System.out.println("Unknown Host Address !\n");
+       System.exit(0);
     }
+    httpH.sendHttpHello(this.model.getLocalUser());
   }
 
   public void updatePseudo(String pseudo) {
     User local_user = model.getLocalUser();
-    User new_user = new User(local_user.getIp(),pseudo);
+    User new_user = new User(local_user.getIp(),pseudo,true);
     model.setLocalUser(new_user);
     MessageSys sys = new MessageSys(Type.ChangePseudo, this.model.getLocalUser());
     try {
-    	this.com.getSendManager().sendBroadcast(sys);
+    	 this.com.getSendManager().sendBroadcast(sys);
     } catch (Exception e) {
-    	System.out.println("Unknown Host Address !\n");
-        System.exit(0);
+    	 System.out.println("Unknown Host Address !\n");
+       System.exit(0);
     }
+    httpH.sendHttpHello(this.model.getLocalUser());
   }
 
   public void disconnect() {
-  MessageSys sys = new MessageSys(Type.Goodbye, this.model.getLocalUser());
+    model.getLocalUser().setConnected(false);
+    MessageSys sys = new MessageSys(Type.Goodbye, this.model.getLocalUser());
     try {
     	this.com.getSendManager().sendBroadcast(sys);
     } catch (Exception e) {
     	System.out.println("Unknown Host Address !\n");
         System.exit(0);
     }
+    httpH.sendHttpHello(this.model.getLocalUser());
     System.exit(0);
   }
 

@@ -43,7 +43,6 @@ public class ReceiveUDP implements Runnable {
             // On récupère l'extension du fichier
             index = filename.lastIndexOf(".");
             String file_extension = filename.substring(index + 1);
-            System.out.println("extension : "+file_extension);
 
             ByteArrayInputStream inStream = new ByteArrayInputStream(data);
             BufferedImage bImg = ImageIO.read(inStream);
@@ -77,8 +76,7 @@ public class ReceiveUDP implements Runnable {
       }
       else if(type.equals(Type.ChangePseudo)) {
           System.out.println("J'ai reçu un ChangePseudo !");
-          this.model.rmUser(user);
-          this.model.addUser(user);
+          this.model.newPseudo(user);
       }
   }
 
