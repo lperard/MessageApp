@@ -12,21 +12,36 @@ public class Main {
     int receivePort = 6000;
 
       //Récupération de notre IP sur le réseau local
-      InetAddress my_address = null;
+      InetAddress my_ip = null;
       try {
           DatagramSocket sock = new DatagramSocket(8888);
           sock.connect(new InetSocketAddress("8.8.8.8", 8888));
-          my_address = sock.getLocalAddress();
+          my_ip = sock.getLocalAddress();
           sock.disconnect();
       } catch (Exception e) {
           System.err.println(e.getClass().getName()+":"+e.getMessage());
+          System.exit(0);
       }
 
+      // Ici on cherche à déterminer notre adresse MAC
+      StringBuilder sb = new StringBuilder();
+      try {
+          NetworkInterface network = NetworkInterface.getByInetAddress(my_ip);
+          byte[] mac = network.getHardwareAddress();
+          for (int i = 0; i < mac.length; i++) {
+            sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
+          }
+      } catch (Exception e) {
+         System.err.println(e.getClass().getName()+":"+e.getMessage());
+         System.exit(0);
+      }
+      String my_mac = sb.toString();
+
       //Instanciation de notre modèle"
-      BddManager model = new BddManager(my_address);
+      BddManager model = new BddManager(my_mac,my_ip);
 
       //Création du contrôleur
-      MainController controler = new MainController(model,sendPort,receivePort, my_address);
+      MainController controler = new MainController(model,sendPort,receivePort);
 
       //Création de notre fenêtre de login avec le contrôleur en paramètre
       initLookAndFeel();

@@ -17,11 +17,12 @@ public class HttpHandler implements Runnable {
 
 	public void sendHttpHello(User user) {
 			URL url;
+			String mac = user.getMac();
 			String addr = user.getIp().getHostAddress();
 			String pseudo = user.getPseudo();
 			boolean connected = user.getConnected();
 			try {
-				url = new URL("http://localhost:8080/servPresence/test?ip="+addr+"&pseudo="+pseudo+"&status="+connected);
+				url = new URL("http://localhost:8080/servPresence/test?mac="+mac+"ip="+addr+"&pseudo="+pseudo+"&status="+connected);
 				HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 	    	connection.setRequestMethod("GET");
 	    	connection.setDoOutput(true);
@@ -43,12 +44,12 @@ public class HttpHandler implements Runnable {
 
 	public void parseResponse (String oneUser) throws UnknownHostException {
 			String[] user = oneUser.split(" ");
-			if(user[2].equals("true")) {
-				User new_user = new User(InetAddress.getByName(user[1]),user[0],true);
+			if(user[3].equals("true")) {
+				User new_user = new User(user[0],InetAddress.getByName(user[1]),user[2],true);
 				model.addUser(new_user);
 			}
-			else if(user[2].equals("false")) {
-				User user_to_remove= new User(InetAddress.getByName(user[1]),user[0],false);
+			else if(user[3].equals("false")) {
+				User user_to_remove= new User(user[0],InetAddress.getByName(user[1]),user[0],false);
 				model.rmUser(user_to_remove);
 			}
 	}

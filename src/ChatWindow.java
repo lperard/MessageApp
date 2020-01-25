@@ -74,7 +74,8 @@ public class ChatWindow extends JFrame implements Observer {
             }
             if(tabExists==-1) {
               InetAddress tab_ip = controler.getModel().getIpFromPseudo(selectedItem);
-              UserTabPane historyPane = new UserTabPane(history,controler,tab_ip);
+              String tab_mac = controler.getModel().getMacFromIp(tab_ip);
+              UserTabPane historyPane = new UserTabPane(history,controler,tab_ip,tab_mac);
               history.addTab(selectedItem,historyPane);
               history.setTabComponentAt(history.getTabCount()-1,new ButtonTabComponent(history));
               history.setSelectedIndex(history.getTabCount()-1);
@@ -161,7 +162,7 @@ public class ChatWindow extends JFrame implements Observer {
           for(int i=0; i<history.getTabCount(); i++) {
             UserTabPane tab = (UserTabPane) history.getComponentAt(i);
             if(tab.getUserIp().getHostAddress().equals(tmp)) {
-              String new_pseudo = controler.getModel().getPseudoFromIP(tab.getUserIp());
+              String new_pseudo = controler.getModel().getPseudoFromIp(tab.getUserIp());
               history.setTitleAt(i,new_pseudo);
             }
           }
@@ -175,11 +176,12 @@ public class ChatWindow extends JFrame implements Observer {
         String tmp = str.replace("new_message_to_","");
         tmp = tmp.replace("_",".");
         try {
-          InetAddress tmp_address = InetAddress.getByName(tmp);
+          InetAddress ip = InetAddress.getByName(tmp);
           for(int i=0; i<history.getTabCount(); i++) {
             UserTabPane tab = (UserTabPane) history.getComponentAt(i);
             if(tab.getUserIp().getHostAddress().equals(tmp)) {
-              UserTabPane new_tab = new UserTabPane(history, controler, tmp_address);
+              String mac = controler.getModel().getMacFromIp(ip);
+              UserTabPane new_tab = new UserTabPane(history, controler, ip, mac);
               history.setComponentAt(i,new_tab);
             }
           }
@@ -193,20 +195,22 @@ public class ChatWindow extends JFrame implements Observer {
         String tmp = str.replace("new_message_from_","");
         tmp = tmp.replace("_",".");
         try {
-          InetAddress tmp_address = InetAddress.getByName(tmp);
+          InetAddress ip = InetAddress.getByName(tmp);
           int tab_already_exists = 0;
           for(int i=0; i<history.getTabCount(); i++) {
             UserTabPane tab = (UserTabPane) history.getComponentAt(i);
             if(tab.getUserIp().getHostAddress().equals(tmp)) {
-              UserTabPane new_tab = new UserTabPane(history, controler, tmp_address);
+              String mac = controler.getModel().getMacFromIp(ip);
+              UserTabPane new_tab = new UserTabPane(history, controler, ip, mac);
               history.setComponentAt(i,new_tab);
               history.setTitleAt(i, history.getTitleAt(i).replace("*","") + " *");
               tab_already_exists = 1;
             }
           }
           if(tab_already_exists == 0) {
-            UserTabPane tab = new UserTabPane(history, controler, tmp_address);
-            String pseudo = controler.getModel().getPseudoFromIP(tmp_address);
+            String mac = controler.getModel().getMacFromIp(ip);
+            UserTabPane tab = new UserTabPane(history, controler, ip, mac);
+            String pseudo = controler.getModel().getPseudoFromIp(ip);
             history.addTab(pseudo + " *",tab);
             history.setTabComponentAt(history.getTabCount()-1,new ButtonTabComponent(history));
           }
@@ -343,6 +347,7 @@ public class ChatWindow extends JFrame implements Observer {
       private final JTabbedPane containerPane;
       private final MainController controler;
       private InetAddress user_ip;
+      private String user_mac;
 
       private JScrollPane scrollPane;
       private JPanel historyPane = new JPanel();
@@ -353,11 +358,12 @@ public class ChatWindow extends JFrame implements Observer {
       private JTextField msg_to_send = new JTextField();
       private JButton open_button = new JButton("Importer");
 
-      public UserTabPane(final JTabbedPane containerPane, final MainController controler, InetAddress user_ip) {
+      public UserTabPane(final JTabbedPane containerPane, final MainController controler, InetAddress user_ip, String user_mac) {
         super(new FlowLayout(FlowLayout.LEFT, 0, 0));
         this.containerPane = containerPane;
         this.controler = controler;
         this.user_ip = user_ip;
+        this.user_mac = user_mac;
         this.setLayout(new BorderLayout());
 
         this.updateHistory();
@@ -483,7 +489,7 @@ public class ChatWindow extends JFrame implements Observer {
 
       public void updateHistory() {
         history = new ArrayList<MessageHistory>();
-        Log log = controler.getModel().getMsgHistory(user_ip);
+        Log log = controler.getModel().getMsgHistory(this.user_mac);
         ArrayList<Message> msg_list = log.getHistory();
         for(int i=0; i<msg_list.size(); i++) {
           MessageHistory new_msg = new MessageHistory(msg_list.get(i), controler);
@@ -493,6 +499,10 @@ public class ChatWindow extends JFrame implements Observer {
 
       public InetAddress getUserIp() {
         return this.user_ip;
+      }
+
+      public String getUserMac() {
+        return this.user_mac;
       }
 
       private class MessageHistory extends JPanel {
@@ -516,16 +526,16 @@ public class ChatWindow extends JFrame implements Observer {
 
           // Récupération des informations du message
           boolean from_me;
-          InetAddress source_address = msg.getSource();
-          InetAddress dest_address = msg.getDest();
-          if(source_address.equals(this.controler.getModel().getLocalUser().getIp())) {
+          String source_address = msg.getSource();
+          String dest_address = msg.getDest();
+          if(source_address.equals(this.controler.getModel().getLocalUser().getMac())) {
             this.source = this.controler.getModel().getLocalUser().getPseudo();
-            this.dest = this.controler.getModel().getPseudoFromIP(dest_address);
+            this.dest = this.controler.getModel().getPseudoFromMac(dest_address);
             from_me = true;
           }
           else {
             this.dest = this.controler.getModel().getLocalUser().getPseudo();
-            this.source = this.controler.getModel().getPseudoFromIP(source_address);
+            this.source = this.controler.getModel().getPseudoFromMac(source_address);
             from_me = false;
           }
 

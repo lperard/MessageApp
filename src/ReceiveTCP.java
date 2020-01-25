@@ -22,8 +22,8 @@ public class ReceiveTCP implements Runnable {
   }
 
   public void processReceivedDataMsg(Message msg) {
-      InetAddress source = msg.getSource();
-      InetAddress dest = msg.getDest();
+      String source = msg.getSource();
+      String dest = msg.getDest();
       byte[] data = msg.getData();
       String timestamp = msg.getTimestamp();
       String filetype = msg.getFiletype();
@@ -34,7 +34,7 @@ public class ReceiveTCP implements Runnable {
         String path = msg.getFilepath();
         int index = path.lastIndexOf("/");
         if(index == -1) {
-          index = path.lastIndexOf("\\");
+            index = path.lastIndexOf("\\");
         }
         String filename = path.substring(index + 1);
         File file = new File("tmp/"+filename);

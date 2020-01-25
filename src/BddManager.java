@@ -12,7 +12,7 @@ public class BddManager implements Observable {
     protected User local_user;
     protected ArrayList<Observer> listObserver;
 
-    public BddManager(InetAddress address) {
+    public BddManager(String mac, InetAddress ip) {
 
         this.bdd_connection = null;
         this.bdd_statement = null;
@@ -20,7 +20,7 @@ public class BddManager implements Observable {
 
         this.connected_users = new ArrayList<User>();
 
-        this.local_user = new User(address,"",false);
+        this.local_user = new User(mac,ip,"",false);
         this.listObserver = new ArrayList<Observer>();
     }
 
@@ -37,7 +37,7 @@ public class BddManager implements Observable {
       // En effet on est dans le cas où son pseudo a changé
       for(int i=0; i<this.connected_users.size();i++) {
         User current = this.connected_users.get(i);
-        if(current.getIp().equals(user.getIp())) {
+        if(current.getMac().equals(user.getMac())) {
           this.connected_users.remove(i);
         }
       }
@@ -49,7 +49,7 @@ public class BddManager implements Observable {
       int index = -1;
       for(int i=0; i<this.connected_users.size();i++) {
         User current = this.connected_users.get(i);
-        if(current.getIp().equals(user.getIp())) {
+        if(current.getMac().equals(user.getMac())) {
           index = i;
         }
       }
@@ -62,7 +62,7 @@ public class BddManager implements Observable {
     public void newPseudo(User user) {
       for(int i=0; i<this.connected_users.size();i++) {
         User current = this.connected_users.get(i);
-        if(current.getIp().equals(user.getIp())) {
+        if(current.getMac().equals(user.getMac())) {
           this.connected_users.remove(i);
         }
       }
@@ -93,24 +93,55 @@ public class BddManager implements Observable {
       return ip;
     }
 
-    public String getPseudoFromIP(InetAddress address) {
+    public String getPseudoFromIp(InetAddress ip) {
       String pseudo = "";
       for(int i = 0; i<this.connected_users.size(); i++) {
         User user = this.connected_users.get(i);
-        if(user.getIp().equals(address)) {
+        if(user.getIp().equals(ip)) {
           pseudo = user.getPseudo();
         }
       }
       return pseudo;
     }
 
-    public void addMessage(InetAddress source, InetAddress dest, byte[] data, String timestamp, String filetype) {
+    public String getPseudoFromMac(String mac) {
+      String pseudo = "";
+      for(int i = 0; i<this.connected_users.size(); i++) {
+        User user = this.connected_users.get(i);
+        if(user.getMac().equals(mac)) {
+          pseudo = user.getPseudo();
+        }
+      }
+      return pseudo;
+    }
+
+    public String getMacFromIp(InetAddress ip) {
+      String mac = "";
+      for(int i = 0; i<this.connected_users.size(); i++) {
+        User user = this.connected_users.get(i);
+        if(user.getIp().equals(ip)) {
+          mac = user.getMac();
+        }
+      }
+      return mac;
+    }
+
+    public InetAddress getIpFromMac(String mac) {
+      InetAddress ip = null;
+      for(int i = 0; i<this.connected_users.size(); i++) {
+        User user = this.connected_users.get(i);
+        if(user.getMac().equals(mac)) {
+          ip = user.getIp();
+        }
+      }
+      return ip;
+    }
+
+    public void addMessage(String source, String dest, byte[] data, String timestamp, String filetype) {
         String sql="";
-        String source_address = source.getHostAddress();
-        String dest_address = dest.getHostAddress();
-        String source_reformatted = source_address.replace('.','_');
-        String dest_reformatted = dest_address.replace('.','_');
         String data_str = new String(data);
+        String ip_source = getIpFromMac(source).getHostAddress();
+        String ip_dest = getIpFromMac(dest).getHostAddress();
 
         try {
 
@@ -118,35 +149,37 @@ public class BddManager implements Observable {
             this.bdd_connection = DriverManager.getConnection("jdbc:sqlite:app.db");
             this.bdd_statement = this.bdd_connection.createStatement();
 
-            if(local_user.getIp().equals(source)) {
-                sql = "create table if not exists LOG_"+ dest_reformatted +" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(300), timestamp VARCHAR(20), filetype VARCHAR(20))";
+            if(local_user.getMac().equals(source)) {
+
+                sql = "create table if not exists LOG_"+ dest +" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(300), timestamp VARCHAR(20), filetype VARCHAR(20))";
                 this.bdd_statement.executeUpdate(sql);
 
-                sql = "insert into LOG_" + dest_reformatted +" (source, dest, data, timestamp, filetype) values (?,?,?,?,?);";
+                sql = "insert into LOG_" + dest +" (source, dest, data, timestamp, filetype) values (?,?,?,?,?);";
                 this.bdd_preparedstatement = this.bdd_connection.prepareStatement(sql);
-                this.bdd_preparedstatement.setString(1, source_address);
-                this.bdd_preparedstatement.setString(2, dest_address);
+                this.bdd_preparedstatement.setString(1, source);
+                this.bdd_preparedstatement.setString(2, dest);
                 this.bdd_preparedstatement.setString(3, data_str);
                 this.bdd_preparedstatement.setString(4, timestamp);
                 this.bdd_preparedstatement.setString(5, filetype);
                 this.bdd_preparedstatement.executeUpdate();
 
-                notifyObserver("new_message_to_"+ dest_reformatted);
+                notifyObserver("new_message_to_"+ ip_dest);
             }
-            else if(local_user.getIp().equals(dest)) {
-                sql = "create table if not exists LOG_"+ source_reformatted +" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(300), timestamp VARCHAR(20), filetype VARCHAR(20))";
+            else if(local_user.getMac().equals(dest)) {
+
+                sql = "create table if not exists LOG_"+ source +" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(300), timestamp VARCHAR(20), filetype VARCHAR(20))";
                 this.bdd_statement.executeUpdate(sql);
 
-                sql = "insert into LOG_" + source_reformatted +" (source, dest, data, timestamp, filetype) values (?,?,?,?,?);";
+                sql = "insert into LOG_" + source +" (source, dest, data, timestamp, filetype) values (?,?,?,?,?);";
                 this.bdd_preparedstatement = this.bdd_connection.prepareStatement(sql);
-                this.bdd_preparedstatement.setString(1, source_address);
-                this.bdd_preparedstatement.setString(2, dest_address);
+                this.bdd_preparedstatement.setString(1, source);
+                this.bdd_preparedstatement.setString(2, dest);
                 this.bdd_preparedstatement.setString(3, data_str);
                 this.bdd_preparedstatement.setString(4, timestamp);
                 this.bdd_preparedstatement.setString(5, filetype);
                 this.bdd_preparedstatement.executeUpdate();
 
-                notifyObserver("new_message_from_"+ source_reformatted);
+                notifyObserver("new_message_from_"+ ip_source);
             }
 
         } catch (Exception e) {
@@ -155,11 +188,8 @@ public class BddManager implements Observable {
         }
     }
 
-    public Log getMsgHistory(InetAddress target) {
+    public Log getMsgHistory(String mac) {
         ResultSet rs = null;
-        String target_address = target.getHostAddress();
-        String target_reformatted = target_address.replace('.','_');
-
         Log log = new Log();
 
         try {
@@ -167,10 +197,10 @@ public class BddManager implements Observable {
             this.bdd_connection = DriverManager.getConnection("jdbc:sqlite:app.db");
             this.bdd_statement = this.bdd_connection.createStatement();
 
-            String sql = "create table if not exists LOG_"+ target_reformatted +" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(300), timestamp VARCHAR(20), filetype VARCHAR(20))";
+            String sql = "create table if not exists LOG_"+ mac +" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(300), timestamp VARCHAR(20), filetype VARCHAR(20))";
             this.bdd_statement.executeUpdate(sql);
 
-            sql = "select * from LOG_"+ target_reformatted +";";
+            sql = "select * from LOG_"+ mac +";";
             rs = this.bdd_statement.executeQuery(sql);
 
             while(rs.next()) {
@@ -179,12 +209,9 @@ public class BddManager implements Observable {
                 String data_str = rs.getString("data");
                 String timestamp = rs.getString("timestamp");
                 String filetype = rs.getString("filetype");
-
-                InetAddress source_address = InetAddress.getByName(source);
-                InetAddress dest_address = InetAddress.getByName(dest);
                 byte[] data = data_str.getBytes();
 
-                Message tmp_msg = new Message(source_address,dest_address,data,timestamp,filetype);
+                Message tmp_msg = new Message(source,dest,data,timestamp,filetype);
                 log.addMessage(tmp_msg);
             }
 

@@ -11,9 +11,9 @@ public class MainController {
   private SocketManager com;
   private HttpHandler httpH;
 
-  public MainController(BddManager model, int sendPort, int receivePort, InetAddress ip) {
+  public MainController(BddManager model, int sendPort, int receivePort) {
     this.model = model;
-    this.com = new SocketManager(this.model, sendPort, receivePort, ip);
+    this.com = new SocketManager(this.model, sendPort, receivePort);
     this.httpH = new HttpHandler(this.model);
     MessageSys sys = new MessageSys(Type.Hello, this.model.getLocalUser());
     try {
@@ -23,8 +23,8 @@ public class MainController {
         System.exit(0);
     }
 
-    Thread http = new Thread(httpH);
-    http.start();
+    /*Thread http = new Thread(httpH);
+    http.start();*/
   }
 
   public BddManager getModel() {
@@ -33,7 +33,7 @@ public class MainController {
 
   public void connect(String pseudo) {
     User local_user = model.getLocalUser();
-    User new_user = new User(local_user.getIp(),pseudo,true);
+    User new_user = new User(local_user.getMac(),local_user.getIp(),pseudo,true);
     model.setLocalUser(new_user);
     MessageSys sys = new MessageSys(Type.Connected, this.model.getLocalUser());
     try {
@@ -42,12 +42,12 @@ public class MainController {
     	 System.out.println("Unknown Host Address !\n");
        System.exit(0);
     }
-    httpH.sendHttpHello(this.model.getLocalUser());
+    //httpH.sendHttpHello(this.model.getLocalUser());
   }
 
   public void updatePseudo(String pseudo) {
     User local_user = model.getLocalUser();
-    User new_user = new User(local_user.getIp(),pseudo,true);
+    User new_user = new User(local_user.getMac(),local_user.getIp(),pseudo,true);
     model.setLocalUser(new_user);
     MessageSys sys = new MessageSys(Type.ChangePseudo, this.model.getLocalUser());
     try {
@@ -56,7 +56,7 @@ public class MainController {
     	 System.out.println("Unknown Host Address !\n");
        System.exit(0);
     }
-    httpH.sendHttpHello(this.model.getLocalUser());
+    //httpH.sendHttpHello(this.model.getLocalUser());
   }
 
   public void disconnect() {
@@ -68,21 +68,22 @@ public class MainController {
     	System.out.println("Unknown Host Address !\n");
         System.exit(0);
     }
-    httpH.sendHttpHello(this.model.getLocalUser());
+    //httpH.sendHttpHello(this.model.getLocalUser());
     System.exit(0);
   }
 
   public void sendMessage(byte[] data, String dest_pseudo) {
-    InetAddress ip_source = model.getLocalUser().getIp();
+    String mac_source = model.getLocalUser().getMac();
     InetAddress ip_dest = model.getIpFromPseudo(dest_pseudo);
+    String mac_dest = model.getMacFromIp(ip_dest);
 
     DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
     LocalDateTime now = LocalDateTime.now();
     String timestamp = new String(dtf.format(now));
 
     if(ip_dest!=null) {
-        model.addMessage(ip_source, ip_dest, data, timestamp, "text");
-        Message msg = new Message(ip_source, ip_dest, data, timestamp, "text");
+        model.addMessage(mac_source, mac_dest, data, timestamp, "text");
+        Message msg = new Message(mac_source, mac_dest, data, timestamp, "text");
         com.getSendManager().TCPserializedSend(msg, ip_dest);
     }
     else {
@@ -91,14 +92,15 @@ public class MainController {
   }
 
   public void sendImage(String path, byte[] data, String dest_pseudo) {
-    InetAddress ip_source = model.getLocalUser().getIp();
+    String mac_source = model.getLocalUser().getMac();
     InetAddress ip_dest = model.getIpFromPseudo(dest_pseudo);
+    String mac_dest = model.getMacFromIp(ip_dest);
 
     DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
     LocalDateTime now = LocalDateTime.now();
     String timestamp = new String(dtf.format(now));
 
-    if(ip_dest!=null) {
+    if(mac_dest!=null) {
         // On sauvegarde l'image dans nos fichiers
         int index = path.lastIndexOf("/");
         if(index == -1) {
@@ -116,7 +118,6 @@ public class MainController {
             // On récupère l'extension du fichier
             index = filename.lastIndexOf(".");
             String file_extension = filename.substring(index + 1);
-            System.out.println("extension : "+file_extension);
 
             ByteArrayInputStream inStream = new ByteArrayInputStream(data);
             BufferedImage bImg = ImageIO.read(inStream);
@@ -126,8 +127,8 @@ public class MainController {
         }
 
         // On ajoute à la bdd un message avec le path du fichier
-        model.addMessage(ip_source, ip_dest, file.getAbsolutePath().getBytes(), timestamp, "img");
-        Message msg = new Message(ip_source, ip_dest, data, timestamp, "img", path);
+        model.addMessage(mac_source, mac_dest, file.getAbsolutePath().getBytes(), timestamp, "img");
+        Message msg = new Message(mac_source, mac_dest, data, timestamp, "img", path);
         com.getSendManager().TCPserializedSend(msg, ip_dest);
     }
     else {
@@ -136,8 +137,9 @@ public class MainController {
   }
 
     public void sendFile(String path, byte[] data, String dest_pseudo) {
-        InetAddress ip_source = model.getLocalUser().getIp();
+        String mac_source = model.getLocalUser().getMac();
         InetAddress ip_dest = model.getIpFromPseudo(dest_pseudo);
+        String mac_dest = model.getMacFromIp(ip_dest);
 
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
         LocalDateTime now = LocalDateTime.now();
@@ -166,8 +168,8 @@ public class MainController {
             }
 
             // On ajoute à la bdd un message avec le path du fichier
-            model.addMessage(ip_source, ip_dest, file.getAbsolutePath().getBytes(), timestamp, "file");
-            Message msg = new Message(ip_source, ip_dest, data, timestamp, "file", path);
+            model.addMessage(mac_source, mac_dest, file.getAbsolutePath().getBytes(), timestamp, "file");
+            Message msg = new Message(mac_source, mac_dest, data, timestamp, "file", path);
             com.getSendManager().TCPserializedSend(msg, ip_dest);
         }
         else {

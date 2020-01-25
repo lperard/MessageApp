@@ -10,7 +10,7 @@ public class SocketManager {
   protected ReceiveTCP receiveTCP;
   protected ReceiveUDP receiveUDP;
 
-  public SocketManager(BddManager model, int sendPort, int receivePort, InetAddress ip) {
+  public SocketManager(BddManager model, int sendPort, int receivePort) {
     this.sendPort = sendPort;
     this.receivePort = receivePort;
 

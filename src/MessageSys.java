@@ -18,15 +18,6 @@ public class MessageSys implements Serializable {
         return print;
     }
 
-    public String constructMessageSystem () {
-    String message = "";
-    String nom = this.type.toString();
-    message += nom;
-    message += " ";
-    message += this.user.toString();
-    return message;
-    }
-
     public Type getType() {
     	return this.type;
     }

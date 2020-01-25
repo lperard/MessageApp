@@ -20,42 +20,6 @@ public class ReceiveUDP implements Runnable {
       }
   }
 
-  public void processReceivedDataMsg(Message msg) {
-      InetAddress source = msg.getSource();
-      InetAddress dest = msg.getDest();
-      byte[] data = msg.getData();
-      String timestamp = msg.getTimestamp();
-      String filetype = msg.getFiletype();
-      if(filetype.equals("text"))
-        this.model.addMessage(source,dest,data,timestamp,filetype);
-      else if(filetype.equals("img")) {
-        // On sauvegarde l'image dans nos fichiers
-        String path = msg.getFilepath();
-        int index = path.lastIndexOf("/");
-        if(index == -1) {
-          index = path.lastIndexOf("\\");
-        }
-        String filename = path.substring(index + 1);
-        File file = new File("img/"+filename);
-        try {
-            file.createNewFile();
-
-            // On récupère l'extension du fichier
-            index = filename.lastIndexOf(".");
-            String file_extension = filename.substring(index + 1);
-
-            ByteArrayInputStream inStream = new ByteArrayInputStream(data);
-            BufferedImage bImg = ImageIO.read(inStream);
-            ImageIO.write(bImg, file_extension, file);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        // On ajoute à la bdd un message avec le path du fichier
-        this.model.addMessage(source,dest,file.getAbsolutePath().getBytes(),timestamp,filetype);
-      }
-  }
-
   public void processReceivedDataSys(MessageSys msys) {
       Type type = msys.getType();
       User user = msys.getUser();
@@ -107,11 +71,6 @@ public class ReceiveUDP implements Runnable {
                 MessageSys message_sys_received = (MessageSys) o;
                 System.out.println("UDP: received serialized Message Sys");
                 processReceivedDataSys(message_sys_received);
-            }
-            else if (o.getClass().toString().compareTo("class Message") == 0){
-                Message message_received = (Message) o;
-                System.out.println("UDP: received serialized Message");
-                processReceivedDataMsg(message_received);
             }
             else {
               System.out.println("Serialization inconnue !");

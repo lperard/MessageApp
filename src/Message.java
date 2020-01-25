@@ -8,14 +8,14 @@ public class Message implements Serializable{
 
 	private static final long serialVersionUID = 1111L;
 
-	protected InetAddress source;
-	protected InetAddress dest;
+	protected String source;
+	protected String dest;
 	protected byte[] data;
 	protected String timestamp;
 	protected String filetype;
 	protected String filepath = null;
 
-    public Message(InetAddress source, InetAddress dest, byte[] data, String timestamp) {
+    public Message(String source, String dest, byte[] data, String timestamp) {
         this.source = source;
         this.dest = dest;
         this.data = data;
@@ -30,7 +30,7 @@ public class Message implements Serializable{
 				this.filetype="text";
     }
 
-		public Message(InetAddress source, InetAddress dest, byte[] data, String timestamp, String filetype) {
+		public Message(String source, String dest, byte[] data, String timestamp, String filetype) {
         this.source = source;
         this.dest = dest;
         this.data = data;
@@ -45,7 +45,7 @@ public class Message implements Serializable{
 				this.filetype=filetype;
     }
 
-		public Message(InetAddress source, InetAddress dest, byte[] data, String timestamp, String filetype, String filepath) {
+		public Message(String source, String dest, byte[] data, String timestamp, String filetype, String filepath) {
         this.source = source;
         this.dest = dest;
         this.data = data;
@@ -61,11 +61,11 @@ public class Message implements Serializable{
 				this.filepath=filepath;
     }
 
-    public InetAddress getSource() {
+    public String getSource() {
         return this.source;
     }
 
-    public InetAddress getDest() {
+    public String getDest() {
         return this.dest;
     }
 
