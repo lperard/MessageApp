@@ -55,7 +55,7 @@ public class BddManager implements Observable {
       }
       if(index!=-1) {
         this.connected_users.remove(index);
-        notifyObserver("new_user_offline_"+user.getIp());
+        notifyObserver("new_user_offline_"+user.getIp().getHostAddress());
       }
     }
 
@@ -67,7 +67,7 @@ public class BddManager implements Observable {
         }
       }
       this.connected_users.add(user);
-      notifyObserver("new_pseudo_"+user.getIp());
+      notifyObserver("new_pseudo_"+user.getIp().getHostAddress());
     }
 
     public ArrayList<User> getUserList() {
@@ -140,8 +140,8 @@ public class BddManager implements Observable {
     public void addMessage(String source, String dest, byte[] data, String timestamp, String filetype) {
         String sql="";
         String data_str = new String(data);
-        String ip_source = getIpFromMac(source).getHostAddress();
-        String ip_dest = getIpFromMac(dest).getHostAddress();
+        String source_reformatted = source.replace("-","_");
+        String dest_reformatted = dest.replace("-","_");
 
         try {
 
@@ -151,10 +151,14 @@ public class BddManager implements Observable {
 
             if(local_user.getMac().equals(source)) {
 
-                sql = "create table if not exists LOG_"+ dest +" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(300), timestamp VARCHAR(20), filetype VARCHAR(20))";
+                String ip_source = getLocalUser().getIp().getHostAddress();
+                String ip_dest = getIpFromMac(dest).getHostAddress();
+                System.out.println("ip source :"+ip_source+" | ip dest : "+ip_dest);
+
+                sql = "create table if not exists LOG_"+ dest_reformatted +" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(300), timestamp VARCHAR(20), filetype VARCHAR(20))";
                 this.bdd_statement.executeUpdate(sql);
 
-                sql = "insert into LOG_" + dest +" (source, dest, data, timestamp, filetype) values (?,?,?,?,?);";
+                sql = "insert into LOG_" + dest_reformatted +" (source, dest, data, timestamp, filetype) values (?,?,?,?,?);";
                 this.bdd_preparedstatement = this.bdd_connection.prepareStatement(sql);
                 this.bdd_preparedstatement.setString(1, source);
                 this.bdd_preparedstatement.setString(2, dest);
@@ -167,10 +171,13 @@ public class BddManager implements Observable {
             }
             else if(local_user.getMac().equals(dest)) {
 
-                sql = "create table if not exists LOG_"+ source +" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(300), timestamp VARCHAR(20), filetype VARCHAR(20))";
+                String ip_source = getIpFromMac(source).getHostAddress();
+                String ip_dest = getLocalUser().getIp().getHostAddress();
+
+                sql = "create table if not exists LOG_"+ source_reformatted +" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(300), timestamp VARCHAR(20), filetype VARCHAR(20))";
                 this.bdd_statement.executeUpdate(sql);
 
-                sql = "insert into LOG_" + source +" (source, dest, data, timestamp, filetype) values (?,?,?,?,?);";
+                sql = "insert into LOG_" + source_reformatted +" (source, dest, data, timestamp, filetype) values (?,?,?,?,?);";
                 this.bdd_preparedstatement = this.bdd_connection.prepareStatement(sql);
                 this.bdd_preparedstatement.setString(1, source);
                 this.bdd_preparedstatement.setString(2, dest);
@@ -191,16 +198,17 @@ public class BddManager implements Observable {
     public Log getMsgHistory(String mac) {
         ResultSet rs = null;
         Log log = new Log();
+        String mac_reformatted = mac.replace("-","_");
 
         try {
             Class.forName("org.sqlite.JDBC");
             this.bdd_connection = DriverManager.getConnection("jdbc:sqlite:app.db");
             this.bdd_statement = this.bdd_connection.createStatement();
 
-            String sql = "create table if not exists LOG_"+ mac +" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(300), timestamp VARCHAR(20), filetype VARCHAR(20))";
+            String sql = "create table if not exists LOG_"+ mac_reformatted +" (source VARCHAR(20), dest VARCHAR(20), data VARCHAR(300), timestamp VARCHAR(20), filetype VARCHAR(20))";
             this.bdd_statement.executeUpdate(sql);
 
-            sql = "select * from LOG_"+ mac +";";
+            sql = "select * from LOG_"+ mac_reformatted +";";
             rs = this.bdd_statement.executeQuery(sql);
 
             while(rs.next()) {

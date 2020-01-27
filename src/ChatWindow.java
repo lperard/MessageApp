@@ -164,6 +164,9 @@ public class ChatWindow extends JFrame implements Observer {
             if(tab.getUserIp().getHostAddress().equals(tmp)) {
               String new_pseudo = controler.getModel().getPseudoFromIp(tab.getUserIp());
               history.setTitleAt(i,new_pseudo);
+              String mac = controler.getModel().getMacFromIp(tmp_address);
+              UserTabPane new_tab = new UserTabPane(history, controler, tmp_address, mac);
+              history.setComponentAt(i,new_tab);
             }
           }
         }
