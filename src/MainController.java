@@ -139,6 +139,7 @@ public class MainController {
     public void sendFile(String path, byte[] data, String dest_pseudo) {
         String mac_source = model.getLocalUser().getMac();
         InetAddress ip_dest = model.getIpFromPseudo(dest_pseudo);
+        System.out.println(ip_dest);
         String mac_dest = model.getMacFromIp(ip_dest);
 
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
