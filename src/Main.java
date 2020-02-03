@@ -1,9 +1,4 @@
 import javax.swing.*;
-
-import Controller.MainController;
-import Model.BddManager;
-import View.LoginWindow;
-
 import java.net.*;
 import java.io.*;
 
@@ -12,6 +7,7 @@ public class Main {
     private static String LOOKANDFEEL = "GTK+";
 
     public static void main(String[] args) {
+
     int sendPort = 5000;
     int receivePort = 6000;
 
