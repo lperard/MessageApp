@@ -15,13 +15,13 @@ public class HttpHandler implements Runnable {
 			this.model = model;
 	}
 
-	public void sendHttpHello(User user) {
+	public void sendHttpRequest(User user) {
 		URL url;
 		String mac = user.getMac();
 		String addr = user.getIp().getHostAddress();
-		String pseudo = user.getPseudo();
+		String pseudo = user.getPseudo().replace(" ","_");
 		boolean connected = user.getConnected();
-        Status status = user.getStatus();
+    Status status = user.getStatus();
 		try {
 			url = new URL("https://srv-gei-tomcat.insa-toulouse.fr/servPresence_LACOTE_PERARD/test?mac="+mac+"&ip="+addr+"&pseudo="+pseudo+"&connected="+connected+"&status="+status);
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -47,19 +47,19 @@ public class HttpHandler implements Runnable {
 			String[] user = oneUser.split(" ");
             Status status;
             if(user[4].equals("local")) {
-                status = Status.Local;   
+                status = Status.Local;
             }
             else {
                 status = Status.Remote;
             }
 			if(user[3].equals("true")) {
-				User new_user = new User(user[0],InetAddress.getByName(user[1]),user[2],true,status);
+				User new_user = new User(user[0],InetAddress.getByName(user[1]),user[2].replace("_"," "),true,status);
 				if(!new_user.getMac().equals(model.getLocalUser().getMac())) {
                     model.addUser(new_user);
                 }
 			}
 			else if(user[3].equals("false")) {
-				User user_to_remove= new User(user[0],InetAddress.getByName(user[1]),user[0],false,status);
+				User user_to_remove= new User(user[0],InetAddress.getByName(user[1]),user[2].replace("_"," "),false,status);
 				model.rmUser(user_to_remove);
 			}
 	}
@@ -70,7 +70,7 @@ public class HttpHandler implements Runnable {
 		while (true) {
 			try {
 				User current_user = model.getLocalUser();
-				sendHttpHello(current_user);
+				sendHttpRequest(current_user);
 				Thread.sleep(3000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();

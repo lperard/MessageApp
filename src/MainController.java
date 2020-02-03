@@ -42,7 +42,7 @@ public class MainController {
     	 System.out.println("Unknown Host Address !\n");
        System.exit(0);
     }
-    httpH.sendHttpHello(this.model.getLocalUser());
+    httpH.sendHttpRequest(this.model.getLocalUser());
   }
 
   public void updatePseudo(String pseudo) {
@@ -56,7 +56,7 @@ public class MainController {
     	 System.out.println("Unknown Host Address !\n");
        System.exit(0);
     }
-    httpH.sendHttpHello(this.model.getLocalUser());
+    httpH.sendHttpRequest(this.model.getLocalUser());
   }
 
   public void disconnect() {
@@ -68,7 +68,7 @@ public class MainController {
     	System.out.println("Unknown Host Address !\n");
         System.exit(0);
     }
-    httpH.sendHttpHello(this.model.getLocalUser());
+    httpH.sendHttpRequest(this.model.getLocalUser());
     System.exit(0);
   }
 
