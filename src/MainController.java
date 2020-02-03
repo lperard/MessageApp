@@ -23,8 +23,8 @@ public class MainController {
         System.exit(0);
     }
 
-    /*Thread http = new Thread(httpH);
-    http.start();*/
+    Thread http = new Thread(httpH);
+    http.start();
   }
 
   public BddManager getModel() {
@@ -42,7 +42,7 @@ public class MainController {
     	 System.out.println("Unknown Host Address !\n");
        System.exit(0);
     }
-    //httpH.sendHttpHello(this.model.getLocalUser());
+    httpH.sendHttpHello(this.model.getLocalUser());
   }
 
   public void updatePseudo(String pseudo) {
@@ -56,7 +56,7 @@ public class MainController {
     	 System.out.println("Unknown Host Address !\n");
        System.exit(0);
     }
-    //httpH.sendHttpHello(this.model.getLocalUser());
+    httpH.sendHttpHello(this.model.getLocalUser());
   }
 
   public void disconnect() {
@@ -68,7 +68,7 @@ public class MainController {
     	System.out.println("Unknown Host Address !\n");
         System.exit(0);
     }
-    //httpH.sendHttpHello(this.model.getLocalUser());
+    httpH.sendHttpHello(this.model.getLocalUser());
     System.exit(0);
   }
 

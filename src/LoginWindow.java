@@ -13,6 +13,7 @@ public class LoginWindow extends JFrame implements Observer {
 
     private JLabel labelPseudo = new JLabel("Choisissez votre pseudo:");
     private JButton connect_button = new JButton("Connexion !");
+    private JButton connect_remote_button = new JButton("Connexion remote !");
     private JTextField textPseudo = new JTextField();
 
     private JLabel online_users = new JLabel("Utilisateurs en ligne:", SwingConstants.CENTER);
@@ -56,11 +57,18 @@ public class LoginWindow extends JFrame implements Observer {
         login.add(textPseudo, c);
 
         c.insets = new Insets(20,0,0,0);
-        c.anchor = GridBagConstraints.LAST_LINE_END;
+        c.anchor = GridBagConstraints.LAST_LINE_START;
         c.gridx = 2;
         c.gridy = 2;
         c.gridwidth = 1;
         login.add(connect_button, c);
+
+        c.insets = new Insets(10,0,0,0);
+        c.anchor = GridBagConstraints.LAST_LINE_END;
+        c.gridx = 2;
+        c.gridy = 3;
+        c.gridwidth = 1;
+        login.add(connect_remote_button, c);
 
         login.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 

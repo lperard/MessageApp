@@ -16,26 +16,26 @@ public class HttpHandler implements Runnable {
 	}
 
 	public void sendHttpHello(User user) {
-			URL url;
-			String mac = user.getMac();
-			String addr = user.getIp().getHostAddress();
-			String pseudo = user.getPseudo();
-			boolean connected = user.getConnected();
-			try {
-				url = new URL("http://localhost:8080/servPresence/test?mac="+mac+"ip="+addr+"&pseudo="+pseudo+"&status="+connected);
-				HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-	    	connection.setRequestMethod("GET");
-	    	connection.setDoOutput(true);
-	    	int status = connection.getResponseCode();
-	    	BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-	    	String inputLine;
-	    	StringBuffer content = new StringBuffer();
-	    	int nb_ligne = 1;
-	    	while ((inputLine = in.readLine()) != null) {
-	    		content.append(inputLine);
-	    		parseResponse(inputLine);
-	    	}
-	    	in.close();
+		URL url;
+		String mac = user.getMac();
+		String addr = user.getIp().getHostAddress();
+		String pseudo = user.getPseudo();
+		boolean connected = user.getConnected();
+		try {
+			url = new URL("https://srv-gei-tomcat.insa-toulouse.fr/ServPresence_LACOTE_PERARD/test?mac="+mac+"ip="+addr+"&pseudo="+pseudo+"&status="+connected);
+			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        	connection.setRequestMethod("GET");
+        	connection.setDoOutput(true);
+        	int status = connection.getResponseCode();
+        	BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        	String inputLine;
+        	StringBuffer content = new StringBuffer();
+        	int nb_ligne = 1;
+        	while ((inputLine = in.readLine()) != null) {
+        		content.append(inputLine);
+        		parseResponse(inputLine);
+        	}
+        	in.close();
 		}
 		catch (IOException e) {
 			e.printStackTrace();
