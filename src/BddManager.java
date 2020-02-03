@@ -35,14 +35,17 @@ public class BddManager implements Observable {
     public void addUser(User user) {
       // Si un utilisateur a déjà l'IP de user, on le supprime avant de le rajouter
       // En effet on est dans le cas où son pseudo a changé
+      boolean already_exists = false;
       for(int i=0; i<this.connected_users.size();i++) {
         User current = this.connected_users.get(i);
         if(current.getMac().equals(user.getMac())) {
           this.connected_users.remove(i);
+          already_exists = true;
         }
       }
       this.connected_users.add(user);
-      notifyObserver("new_user_online");
+      if(!already_exists)
+        notifyObserver("new_user_online");
     }
 
     public void rmUser(User user) {

@@ -73,7 +73,6 @@ public class MainController {
   }
 
   public void sendMessage(byte[] data, String dest_pseudo) {
-    System.out.println("pseudo pour send : "+dest_pseudo);
     String mac_source = model.getLocalUser().getMac();
     InetAddress ip_dest = model.getIpFromPseudo(dest_pseudo);
     String mac_dest = model.getMacFromIp(ip_dest);

@@ -49,7 +49,6 @@ public class HttpHandler implements Runnable {
 		boolean connected = user.getConnected();
 		URL url;
 		try {
-			System.out.println(addr);
 			url = new URL("https://srv-gei-tomcat.insa-toulouse.fr/servPresence_LACOTE_PERARD/test?mac="+mac+"&ip="+addr+"&pseudo="+pseudo+"&status="+connected);
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 	    	connection.setRequestMethod("DELETE");
