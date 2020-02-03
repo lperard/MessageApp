@@ -21,12 +21,13 @@ public class HttpHandler implements Runnable {
 		String addr = user.getIp().getHostAddress();
 		String pseudo = user.getPseudo();
 		boolean connected = user.getConnected();
+        Status status = user.getStatus();
 		try {
-			url = new URL("https://srv-gei-tomcat.insa-toulouse.fr/servPresence_LACOTE_PERARD/test?mac="+mac+"&ip="+addr+"&pseudo="+pseudo+"&status="+connected);
+			url = new URL("https://srv-gei-tomcat.insa-toulouse.fr/servPresence_LACOTE_PERARD/test?mac="+mac+"&ip="+addr+"&pseudo="+pseudo+"&connected="+connected+"&status="+status);
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         	connection.setRequestMethod("GET");
         	connection.setDoOutput(true);
-        	int status = connection.getResponseCode();
+        	int result = connection.getResponseCode();
         	BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         	String inputLine;
         	StringBuffer content = new StringBuffer();
@@ -47,13 +48,14 @@ public class HttpHandler implements Runnable {
 		String addr = user.getIp().getHostAddress();
 		String pseudo = user.getPseudo();
 		boolean connected = user.getConnected();
+        Status status = user.getStatus();
 		URL url;
 		try {
-			url = new URL("https://srv-gei-tomcat.insa-toulouse.fr/servPresence_LACOTE_PERARD/test?mac="+mac+"&ip="+addr+"&pseudo="+pseudo+"&status="+connected);
+			url = new URL("https://srv-gei-tomcat.insa-toulouse.fr/servPresence_LACOTE_PERARD/test?mac="+mac+"&ip="+addr+"&pseudo="+pseudo+"&connected="+connected+"&status="+status);
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 	    	connection.setRequestMethod("DELETE");
 	    	connection.setDoOutput(true);
-	    	int status = connection.getResponseCode();
+	    	int result = connection.getResponseCode();
 	    	BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 	    	String inputLine;
 	    	StringBuffer content = new StringBuffer();
@@ -72,14 +74,21 @@ public class HttpHandler implements Runnable {
 
 	public void parseResponse (String oneUser) throws UnknownHostException {
 			String[] user = oneUser.split(" ");
+            Status status;
+            if(user[4].equals("local")) {
+                status = Status.Local;   
+            }
+            else {
+                status = Status.Remote;
+            }
 			if(user[3].equals("true")) {
-				User new_user = new User(user[0],InetAddress.getByName(user[1]),user[2],true);
+				User new_user = new User(user[0],InetAddress.getByName(user[1]),user[2],true,status);
 				if(!new_user.getMac().equals(model.getLocalUser().getMac())) {
                     model.addUser(new_user);
                 }
 			}
 			else if(user[3].equals("false")) {
-				User user_to_remove= new User(user[0],InetAddress.getByName(user[1]),user[0],false);
+				User user_to_remove= new User(user[0],InetAddress.getByName(user[1]),user[0],false,status);
 				model.rmUser(user_to_remove);
 			}
 	}
