@@ -74,7 +74,13 @@ public class LoginWindow extends JFrame implements Observer {
 
         connect_button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-              choosePseudo();
+              choosePseudo(Status.Local);
+            }
+        });
+
+        connect_remote_button.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+              choosePseudo(Status.Remote);
             }
         });
 
@@ -86,14 +92,14 @@ public class LoginWindow extends JFrame implements Observer {
         }
         public void keyPressed(KeyEvent e) {
            if(e.getKeyCode() == KeyEvent.VK_ENTER){
-             choosePseudo();
+             choosePseudo(Status.Local);
            }
         }
         public void keyReleased(KeyEvent e) {
         }
      }
 
-     public void choosePseudo() {
+     public void choosePseudo(Status status) {
       String pseudo = textPseudo.getText();
       if(!pseudo.equals("")) {
         if(pseudo.length()>16) {
@@ -109,7 +115,7 @@ public class LoginWindow extends JFrame implements Observer {
           }
           if(!pseudoAlreadyTaken) {
               if(!alreadyConnected)
-                controler.connect(pseudo);
+                controler.connect(pseudo, status);
               else
                 controler.updatePseudo(pseudo);
               controler.getModel().removeObserver();

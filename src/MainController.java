@@ -31,9 +31,9 @@ public class MainController {
     return this.model;
   }
 
-  public void connect(String pseudo) {
+  public void connect(String pseudo, Status status) {
     User local_user = model.getLocalUser();
-    User new_user = new User(local_user.getMac(),local_user.getIp(),pseudo,true);
+    User new_user = new User(local_user.getMac(),local_user.getIp(),pseudo,true, status);
     model.setLocalUser(new_user);
     MessageSys sys = new MessageSys(Type.Connected, this.model.getLocalUser());
     try {
@@ -68,7 +68,7 @@ public class MainController {
     	System.out.println("Unknown Host Address !\n");
         System.exit(0);
     }
-    httpH.sendHttpHello(this.model.getLocalUser());
+    httpH.sendHttpGoodbye(this.model.getLocalUser());
     System.exit(0);
   }
 
