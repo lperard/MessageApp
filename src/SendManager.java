@@ -22,7 +22,6 @@ public class SendManager {
 
     public void TCPserializedSend (Object obj, InetAddress distant) {
         try{
-        	System.out.println(distant);
             Socket sock = new Socket(distant, port);
       		ObjectOutputStream oos = new ObjectOutputStream(sock.getOutputStream());
       		oos.writeObject(obj);
