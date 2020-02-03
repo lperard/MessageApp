@@ -35,7 +35,7 @@ public class HttpHandler implements Runnable {
         		content.append(inputLine);
         		parseResponse(inputLine);
         	}
-        	System.out.println("End of HTPP response");
+        	System.out.println("End of HTTP response");
         	in.close();
 		}
 		catch (IOException e) {
