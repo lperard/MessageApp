@@ -35,7 +35,6 @@ public class HttpHandler implements Runnable {
         		content.append(inputLine);
         		parseResponse(inputLine);
         	}
-        	System.out.println("End of HTTP response");
         	in.close();
 		}
 		catch (IOException e) {
@@ -91,7 +90,6 @@ public class HttpHandler implements Runnable {
 		System.out.println("HttpHandler lancé !");
 		while (true) {
 			try {
-				System.out.println("Tentative de GET");
 				User current_user = model.getLocalUser();
 				sendHttpHello(current_user);
 				Thread.sleep(3000);
