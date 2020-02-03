@@ -22,7 +22,7 @@ public class HttpHandler implements Runnable {
 		String pseudo = user.getPseudo();
 		boolean connected = user.getConnected();
 		try {
-			url = new URL("https://srv-gei-tomcat.insa-toulouse.fr/ServPresence_LACOTE_PERARD/test?mac="+mac+"ip="+addr+"&pseudo="+pseudo+"&status="+connected);
+			url = new URL("https://srv-gei-tomcat.insa-toulouse.fr/servPresence_LACOTE_PERARD/test?mac="+mac+"&ip="+addr+"&pseudo="+pseudo+"&status="+connected);
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         	connection.setRequestMethod("GET");
         	connection.setDoOutput(true);
@@ -35,6 +35,7 @@ public class HttpHandler implements Runnable {
         		content.append(inputLine);
         		parseResponse(inputLine);
         	}
+        	System.out.println("End of HTPP response");
         	in.close();
 		}
 		catch (IOException e) {
@@ -59,9 +60,10 @@ public class HttpHandler implements Runnable {
 		System.out.println("HttpHandler lancé !");
 		while (true) {
 			try {
-				Thread.sleep(5000);
+				System.out.println("Tentative de GET");
 				User current_user = model.getLocalUser();
 				sendHttpHello(current_user);
+				Thread.sleep(3000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
