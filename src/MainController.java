@@ -47,7 +47,7 @@ public class MainController {
 
   public void updatePseudo(String pseudo) {
     User local_user = model.getLocalUser();
-    User new_user = new User(local_user.getMac(),local_user.getIp(),pseudo,true);
+    User new_user = new User(local_user.getMac(),local_user.getIp(),pseudo,true,local_user.getStatus());
     model.setLocalUser(new_user);
     MessageSys sys = new MessageSys(Type.ChangePseudo, this.model.getLocalUser());
     try {

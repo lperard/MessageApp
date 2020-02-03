@@ -1,6 +1,6 @@
 public enum Status {
-    Local("LOCAL"),
-    Remote("REMOTE");
+    Local("local"),
+    Remote("remote");
 
 	private String status = "";
 
