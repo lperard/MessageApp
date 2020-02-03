@@ -42,6 +42,35 @@ public class HttpHandler implements Runnable {
 			e.printStackTrace();
 		}
 	}
+	
+	public void sendHttpGoodbye (User user) {
+		String mac = user.getMac();
+		String addr = user.getIp().getHostAddress();
+		String pseudo = user.getPseudo();
+		boolean connected = user.getConnected();
+		URL url;
+		try {
+			System.out.println(addr);
+			url = new URL("https://srv-gei-tomcat.insa-toulouse.fr/servPresence_LACOTE_PERARD/test?mac="+mac+"&ip="+addr+"&pseudo="+pseudo+"&status="+connected);
+			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+	    	connection.setRequestMethod("DELETE");
+	    	connection.setDoOutput(true);
+	    	int status = connection.getResponseCode();
+	    	BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+	    	String inputLine;
+	    	StringBuffer content = new StringBuffer();
+	    	int nb_ligne = 1;
+	    	while ((inputLine = in.readLine()) != null) {
+	    		content.append(inputLine);
+	    		parseResponse(inputLine);
+	    	}
+	    	
+	    	in.close();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 	public void parseResponse (String oneUser) throws UnknownHostException {
 			String[] user = oneUser.split(" ");
