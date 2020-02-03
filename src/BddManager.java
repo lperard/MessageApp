@@ -137,6 +137,20 @@ public class BddManager implements Observable {
       return ip;
     }
 
+    public String getStatusFromPseudo(String pseudo) {
+        String status = "";
+        for(int i = 0; i < this.connected_users.size(); i++) {
+            User user = this.connected_users.get(i);
+            if(user.getPseudo().equals(pseudo)) {
+                if(user.getStatus().equals(Status.Local))
+                    status = "local";   
+                else
+                    status = "remote";
+            }
+        }
+        return status;
+    }
+
     public void addMessage(String source, String dest, byte[] data, String timestamp, String filetype) {
         String sql="";
         String data_str = new String(data);

@@ -34,7 +34,7 @@ public class ChatWindow extends JFrame implements Observer {
         this.controler.getModel().addObserver(this);
 
         this.user_list = new JList<String>(this.controler.getModel().getPseudoList());
-        this.user_list.setCellRenderer(new UserListLabel());
+        this.user_list.setCellRenderer(new UserListLabel(this.controler.getModel()));
         this.current_pseudo = new JLabel("Connecté en tant que "+current_pseudo, SwingConstants.CENTER);
         this.history.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
@@ -324,16 +324,19 @@ public class ChatWindow extends JFrame implements Observer {
     private class UserListLabel extends JLabel implements ListCellRenderer<String> {
 
       private final String icon = "../img/user_icon.png";
+      private BddManager model;
 
-      public UserListLabel() {
+      public UserListLabel(BddManager model) {
         this.setOpaque(true);
+        this.model = model;
       }
 
       @Override
       public Component getListCellRendererComponent(JList<? extends String> list, String pseudo, int index, boolean selected, boolean expanded) {
 
          this.setIcon(new ImageIcon(getClass().getResource(this.icon)));
-         this.setText(pseudo);
+         String status = this.model.getStatusFromPseudo(pseudo);
+         this.setText(pseudo + " (" + status + ")");
          if (selected) {
            this.setBackground(list.getSelectionBackground());
            this.setForeground(list.getSelectionForeground());
