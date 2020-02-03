@@ -436,7 +436,7 @@ public class ChatWindow extends JFrame implements Observer {
         else if(!msg.equals("")) {
             msg_to_send.setText("");
             String dest_pseudo = containerPane.getTitleAt(containerPane.getSelectedIndex());
-            dest_pseudo = dest_pseudo.replace(" *";"");
+            dest_pseudo = dest_pseudo.replace(" *","");
             controler.sendMessage(msg.getBytes(),dest_pseudo);
         }
         else {
@@ -474,7 +474,7 @@ public class ChatWindow extends JFrame implements Observer {
                     ImageIO.write(bImage, file_extension, bos);
                     byte[] data = bos.toByteArray();
                     String dest_pseudo = containerPane.getTitleAt(containerPane.getSelectedIndex());
-                    dest_pseudo = dest_pseudo.replace(" *";"");
+                    dest_pseudo = dest_pseudo.replace(" *","");
                     controler.sendImage(path,data,dest_pseudo);
                 }
                 else {
