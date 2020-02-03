@@ -68,7 +68,7 @@ public class MainController {
     	System.out.println("Unknown Host Address !\n");
         System.exit(0);
     }
-    httpH.sendHttpGoodbye(this.model.getLocalUser());
+    httpH.sendHttpHello(this.model.getLocalUser());
     System.exit(0);
   }
 
