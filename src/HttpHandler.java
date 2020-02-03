@@ -76,7 +76,7 @@ public class HttpHandler implements Runnable {
 			String[] user = oneUser.split(" ");
 			if(user[3].equals("true")) {
 				User new_user = new User(user[0],InetAddress.getByName(user[1]),user[2],true);
-				if(!new_user.getMac().equals(model.getLocalUser().getMac()) {
+				if(!new_user.getMac().equals(model.getLocalUser().getMac())) {
                     model.addUser(new_user);
                 }
 			}
