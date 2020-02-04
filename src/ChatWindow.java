@@ -405,7 +405,11 @@ public class ChatWindow extends JFrame implements Observer {
 
         send_button.addActionListener(new ActionListener () {
           public void actionPerformed(ActionEvent e) {
-            processMsg();
+            if(controler.getModel().getStatusFromMac(user_mac).equals("local"))
+                processMsg();
+            else {
+                JOptionPane.showMessageDialog(null,"Impossible d'envoyer un message à un utilisateur se trouvant sur un autre réseau !");
+            }
           }
         });
 
@@ -481,7 +485,6 @@ public class ChatWindow extends JFrame implements Observer {
                     controler.sendImage(path,data,dest_pseudo);
                 }
                 else {
-
                     byte[] data = new byte [(int)file.length()];
                     FileInputStream fis = new FileInputStream(file);
                     BufferedInputStream bis = new BufferedInputStream(fis);
