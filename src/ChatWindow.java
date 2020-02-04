@@ -338,7 +338,7 @@ public class ChatWindow extends JFrame implements Observer {
       @Override
       public Component getListCellRendererComponent(JList<? extends String> list, String pseudo, int index, boolean selected, boolean expanded) {
 
-         this.setIcon(new ImageIcon(getClass().getResource(this.icon)));
+         //this.setIcon(new ImageIcon(getClass().getResource(this.icon)));
          String status = this.model.getStatusFromPseudo(pseudo);
          this.setText(pseudo + " (" + status + ")");
          if (selected) {
