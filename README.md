@@ -1,4 +1,4 @@
-# POO Project : MessageApp
+# POO Projet : MessageApp
 
 ## Prérequis:
 
