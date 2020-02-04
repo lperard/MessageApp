@@ -75,7 +75,8 @@ public class ChatWindow extends JFrame implements Observer {
             if(tabExists==-1) {
               InetAddress tab_ip = controler.getModel().getIpFromPseudo(selectedItem);
               String tab_mac = controler.getModel().getMacFromIp(tab_ip);
-              UserTabPane historyPane = new UserTabPane(history,controler,tab_ip,tab_mac);
+              String pseudo = controler.getModel().getPseudoFromMac(tab_mac);
+              UserTabPane historyPane = new UserTabPane(history,controler,tab_ip,tab_mac, pseudo);
               history.addTab(selectedItem,historyPane);
               history.setTabComponentAt(history.getTabCount()-1,new ButtonTabComponent(history));
               history.setSelectedIndex(history.getTabCount()-1);
@@ -165,7 +166,8 @@ public class ChatWindow extends JFrame implements Observer {
               String new_pseudo = controler.getModel().getPseudoFromIp(tab.getUserIp());
               history.setTitleAt(i,new_pseudo);
               String mac = controler.getModel().getMacFromIp(tmp_address);
-              UserTabPane new_tab = new UserTabPane(history, controler, tmp_address, mac);
+              String pseudo = controler.getModel().getPseudoFromMac(mac);
+              UserTabPane new_tab = new UserTabPane(history, controler, tmp_address, mac, pseudo);
               history.setComponentAt(i,new_tab);
             }
           }
@@ -184,7 +186,8 @@ public class ChatWindow extends JFrame implements Observer {
             UserTabPane tab = (UserTabPane) history.getComponentAt(i);
             if(tab.getUserIp().getHostAddress().equals(tmp)) {
               String mac = controler.getModel().getMacFromIp(ip);
-              UserTabPane new_tab = new UserTabPane(history, controler, ip, mac);
+              String pseudo = controler.getModel().getPseudoFromMac(mac);
+              UserTabPane new_tab = new UserTabPane(history, controler, ip, mac, pseudo);
               history.setComponentAt(i,new_tab);
             }
           }
@@ -204,7 +207,8 @@ public class ChatWindow extends JFrame implements Observer {
             UserTabPane tab = (UserTabPane) history.getComponentAt(i);
             if(tab.getUserIp().getHostAddress().equals(tmp)) {
               String mac = controler.getModel().getMacFromIp(ip);
-              UserTabPane new_tab = new UserTabPane(history, controler, ip, mac);
+              String pseudo = controler.getModel().getPseudoFromMac(mac);
+              UserTabPane new_tab = new UserTabPane(history, controler, ip, mac, pseudo);
               history.setComponentAt(i,new_tab);
               history.setTitleAt(i, history.getTitleAt(i).replace("*","") + " *");
               tab_already_exists = 1;
@@ -212,8 +216,8 @@ public class ChatWindow extends JFrame implements Observer {
           }
           if(tab_already_exists == 0) {
             String mac = controler.getModel().getMacFromIp(ip);
-            UserTabPane tab = new UserTabPane(history, controler, ip, mac);
-            String pseudo = controler.getModel().getPseudoFromIp(ip);
+            String pseudo = controler.getModel().getPseudoFromMac(mac);
+            UserTabPane tab = new UserTabPane(history, controler, ip, mac, pseudo);
             history.addTab(pseudo + " *",tab);
             history.setTabComponentAt(history.getTabCount()-1,new ButtonTabComponent(history));
           }
@@ -354,6 +358,7 @@ public class ChatWindow extends JFrame implements Observer {
       private final MainController controler;
       private InetAddress user_ip;
       private String user_mac;
+      private String user_pseudo;
 
       private JScrollPane scrollPane;
       private JPanel historyPane = new JPanel();
@@ -364,10 +369,11 @@ public class ChatWindow extends JFrame implements Observer {
       private JTextField msg_to_send = new JTextField();
       private JButton open_button = new JButton("Importer");
 
-      public UserTabPane(final JTabbedPane containerPane, final MainController controler, InetAddress user_ip, String user_mac) {
+      public UserTabPane(final JTabbedPane containerPane, final MainController controler, InetAddress user_ip, String user_mac, String user_pseudo) {
         super(new FlowLayout(FlowLayout.LEFT, 0, 0));
         this.containerPane = containerPane;
         this.controler = controler;
+        this.user_pseudo = user_pseudo;
         this.user_ip = user_ip;
         this.user_mac = user_mac;
         this.setLayout(new BorderLayout());
@@ -442,9 +448,7 @@ public class ChatWindow extends JFrame implements Observer {
         }
         else if(!msg.equals("")) {
             msg_to_send.setText("");
-            String dest_pseudo = containerPane.getTitleAt(containerPane.getSelectedIndex());
-            dest_pseudo = dest_pseudo.replace(" *","");
-            controler.sendMessage(msg.getBytes(),dest_pseudo);
+            controler.sendMessage(msg.getBytes(),user_pseudo);
         }
         else {
           Object[] options = {"Envoyer quand même", "Annuler"};
@@ -455,8 +459,7 @@ public class ChatWindow extends JFrame implements Observer {
                                               options,
                                               options[1]);
           if(choice==0) {
-            String dest_pseudo = containerPane.getTitleAt(containerPane.getSelectedIndex());
-            controler.sendMessage(msg.getBytes(),dest_pseudo);
+            controler.sendMessage(msg.getBytes(),user_pseudo);
           }
         }
       }
@@ -480,17 +483,14 @@ public class ChatWindow extends JFrame implements Observer {
                     ByteArrayOutputStream bos = new ByteArrayOutputStream();
                     ImageIO.write(bImage, file_extension, bos);
                     byte[] data = bos.toByteArray();
-                    String dest_pseudo = containerPane.getTitleAt(containerPane.getSelectedIndex());
-                    dest_pseudo = dest_pseudo.replace(" *","");
-                    controler.sendImage(path,data,dest_pseudo);
+                    controler.sendImage(path,data,user_pseudo);
                 }
                 else {
                     byte[] data = new byte [(int)file.length()];
                     FileInputStream fis = new FileInputStream(file);
                     BufferedInputStream bis = new BufferedInputStream(fis);
                     bis.read(data,0,data.length);
-                    String dest_pseudo = containerPane.getTitleAt(containerPane.getSelectedIndex());
-                    controler.sendFile(path,data,dest_pseudo);
+                    controler.sendFile(path,data,user_pseudo);
                 }
             } catch (Exception e) {
                 System.err.println(e.getClass().getName()+":"+e.getMessage());
